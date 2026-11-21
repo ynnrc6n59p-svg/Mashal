@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>بنك الأسئلة التفاعلي - أساسيات مصرفية الأفراد</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Cairo', 'sans-serif'],
+          },
+          colors: {
+            navy: {
+              800: '#102a43',
+              900: '#0a192f',
+            },
+            gold: {
+              400: '#fbbf24',
+              500: '#d97706',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+      background-color: #f0f4f8;
+      color: #102a43;
+      overflow-x: hidden;
+    }
+    .option-card {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .option-card:not(:disabled):hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(16, 42, 67, 0.08);
+    }
+    /* Custom Toggle Switch */
+    .toggle-checkbox:checked {
+      right: auto;
+      left: 0;
+      border-color: #059669;
+    }
+    .toggle-checkbox:checked + .toggle-label {
+      background-color: #059669;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-gradient-to-l from-navy-900 via-navy-800 to-slate-900 text-white shadow-lg sticky top-0 z-30">
+    <div class="max-w-5xl mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3 cursor-pointer" onclick="goHome()">
+        <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-400 font-extrabold text-xl">
+          🏦
+        </div>
+        <div>
+          <h1 class="text-lg sm:text-xl font-extrabold tracking-tight text-white">أساسيات مصرفية الأفراد</h1>
+          <p class="text-xs text-slate-300">منصة الاختبارات التفاعلية الشاملة (302 سؤال)</p>
+        </div>
+      </div>
+      <div id="headerStats" class="flex items-center gap-2 text-xs sm:text-sm">
+        <span class="bg-white/10 px-3 py-1.5 rounded-lg border border-white/10">
+          الأسئلة الخاطئة المحفوظة: <strong id="savedWrongCount" class="text-amber-400">0</strong>
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="flex-grow max-w-4xl w-full mx-auto px-4 py-6 sm:py-8">
+
+    <!-- VIEW 1: HOME DASHBOARD -->
+    <section id="homeView" class="space-y-6">
+      <!-- Welcome & Global Settings Banner -->
+      <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-200/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-xl font-extrabold text-navy-900">اختر مجموعة الاختبار للبدء</h2>
+          <p class="text-sm text-slate-600 mt-1">تم تقسيم التجميعات إلى 3 مجموعات بالإضافة للاختبار الشامل، مع عرض سؤال بسؤال وتصحيح فوري.</p>
+        </div>
+
+        <!-- Randomize Toggle -->
+        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 flex items-center gap-3 self-stretch sm:self-auto justify-between">
+          <div>
+            <span class="block text-sm font-bold text-navy-800">ترتيب الأسئلة</span>
+            <span id="randomModeText" class="text-xs text-emerald-700 font-semibold">عشوائي (موصى به)</span>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="globalRandomToggle" class="sr-only peer" checked onchange="updateRandomLabel()">
+            <div class="w-12 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:-translate-x-6 after:content-[''] after:absolute after:top-[2px] after:right-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+          </label>
+        </div>
+      </div>
+
+      <!-- 4 Quiz Groups Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+        <!-- Group 1 -->
+        <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 hover:border-navy-800/40 transition flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-800 border border-blue-200">المجموعة الأولى</span>
+              <span id="badge-g1" class="text-xs font-bold text-slate-500">لم يتم الاختبار</span>
+            </div>
+            <h3 class="text-lg font-extrabold text-navy-900 mb-1">الأسئلة من 1 إلى 100</h3>
+            <p class="text-xs text-slate-500 mb-4">تشمل مبادئ الالتزام، الاحتيال المالي، غسل الأموال، الصيرفة الإسلامية، وحماية العملاء.</p>
+          </div>
+          <button onclick="startQuiz('g1')" class="w-full py-3 px-4 bg-navy-800 hover:bg-navy-900 text-white font-bold rounded-xl shadow-sm transition flex items-center justify-center gap-2">
+            <span>ابدأ المجموعة الأولى (100 سؤال)</span>
+            <span>←</span>
+          </button>
+        </div>
+
+        <!-- Group 2 -->
+        <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 hover:border-navy-800/40 transition flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 text-indigo-800 border border-indigo-200">المجموعة الثانية</span>
+              <span id="badge-g2" class="text-xs font-bold text-slate-500">لم يتم الاختبار</span>
+            </div>
+            <h3 class="text-lg font-extrabold text-navy-900 mb-1">الأسئلة من 101 إلى 200</h3>
+            <p class="text-xs text-slate-500 mb-4">تشمل الحسابات البنكية، البطاقات الائتمانية، التمويل المسؤول، والمدد النظامية.</p>
+          </div>
+          <button onclick="startQuiz('g2')" class="w-full py-3 px-4 bg-navy-800 hover:bg-navy-900 text-white font-bold rounded-xl shadow-sm transition flex items-center justify-center gap-2">
+            <span>ابدأ المجموعة الثانية (100 سؤال)</span>
+            <span>←</span>
+          </button>
+        </div>
+
+        <!-- Group 3 -->
+        <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 hover:border-navy-800/40 transition flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="px-3 py-1 rounded-full text-xs font-bold bg-purple-50 text-purple-800 border border-purple-200">المجموعة الثالثة</span>
+              <span id="badge-g3" class="text-xs font-bold text-slate-500">لم يتم الاختبار</span>
+            </div>
+            <h3 class="text-lg font-extrabold text-navy-900 mb-1">الأسئلة من 201 إلى 302</h3>
+            <p class="text-xs text-slate-500 mb-4">تشمل نظام مراقبة البنوك، الأوراق التجارية، صيغ التمويل الإسلامي، والحوكمة.</p>
+          </div>
+          <button onclick="startQuiz('g3')" class="w-full py-3 px-4 bg-navy-800 hover:bg-navy-900 text-white font-bold rounded-xl shadow-sm transition flex items-center justify-center gap-2">
+            <span>ابدأ المجموعة الثالثة (102 سؤال)</span>
+            <span>←</span>
+          </button>
+        </div>
+
+        <!-- Group 4: Full Comprehensive Exam -->
+        <div class="bg-gradient-to-br from-navy-900 to-navy-800 text-white rounded-2xl p-5 shadow-md border border-amber-500/30 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="px-3 py-1 rounded-full text-xs font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30">الاختبار الشامل الكامل</span>
+              <span id="badge-all" class="text-xs font-bold text-amber-300">لم يتم الاختبار</span>
+            </div>
+            <h3 class="text-lg font-extrabold text-white mb-1">جميع الأسئلة (1 - 302)</h3>
+            <p class="text-xs text-slate-300 mb-4">اختبار شامل يضم كامل أسئلة التجميعات والملفات الـ 4 للمراجعة النهائية الشاملة.</p>
+          </div>
+          <button onclick="startQuiz('all')" class="w-full py-3 px-4 bg-amber-500 hover:bg-amber-600 text-navy-900 font-extrabold rounded-xl shadow-sm transition flex items-center justify-center gap-2">
+            <span>ابدأ الاختبار الشامل (302 سؤال)</span>
+            <span>←</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Practice Missed Questions Card -->
+      <div id="missedQuestionsBox" class="hidden bg-rose-50 border border-rose-200 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center font-extrabold text-xl shrink-0">🎯</div>
+          <div>
+            <h4 class="font-extrabold text-rose-950 text-base">مراجعة الأسئلة التي أخطأت فيها سابقاً</h4>
+            <p class="text-xs text-rose-800 mt-0.5">لديك <span id="missedCountInline" class="font-bold">0</span> سؤال محفوظ في قائمة الأخطاء لتقوية نقاط ضعفك.</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+          <button onclick="startQuiz('missed')" class="flex-1 sm:flex-initial py-2.5 px-4 bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold rounded-xl transition">
+            اختبر أخطائي الآن
+          </button>
+          <button onclick="clearMissedQuestions()" class="py-2.5 px-3 bg-white hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold rounded-xl transition" title="مسح سجل الأخطاء">
+            مسح
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 2: ACTIVE QUIZ (ONE QUESTION AT A TIME) -->
+    <section id="quizView" class="hidden space-y-5">
+      <!-- Top Bar: Group Name, Live Score, Exit Button -->
+      <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-2">
+          <button onclick="confirmExit()" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition">
+            ✕ إنهاء والعودة
+          </button>
+          <span id="quizGroupTitle" class="text-sm font-extrabold text-navy-900">المجموعة الأولى</span>
+        </div>
+
+        <div class="flex items-center gap-3 text-xs sm:text-sm">
+          <span class="px-3 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold">
+            الدرجة: <span id="liveScore">0</span>
+          </span>
+          <span class="px-3 py-1 rounded-lg bg-slate-100 text-slate-800 font-bold">
+            السؤال <span id="currentQIndex">1</span> من <span id="totalQCount">100</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
+        <div id="progressBar" class="bg-emerald-600 h-2.5 rounded-full transition-all duration-300" style="width: 1%"></div>
+      </div>
+
+      <!-- Question Card -->
+      <div class="bg-white rounded-2xl p-5 sm:p-7 shadow-md border border-slate-200/90 space-y-6">
+        <!-- Question Metadata Badge -->
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <span id="originalQBadge" class="text-xs font-bold px-2.5 py-1 rounded-md bg-slate-100 text-slate-600">
+            رقم السؤال في البنك: #1
+          </span>
+          <span id="multiSelectHint" class="hidden text-xs font-extrabold px-3 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-300">
+            مطلوب اختيار إجابتين صحيحتين
+          </span>
+        </div>
+
+        <!-- Question Text -->
+        <h2 id="questionText" class="text-lg sm:text-xl font-extrabold text-navy-900 leading-relaxed">
+          نص السؤال يظهر هنا...
+        </h2>
+
+        <!-- Options List -->
+        <div id="optionsContainer" class="space-y-3">
+          <!-- Options injected dynamically -->
+        </div>
+
+        <!-- Submit Multi-Select Button -->
+        <div id="multiSubmitWrapper" class="hidden pt-2">
+          <button id="submitMultiBtn" onclick="submitMultiAnswer()" disabled class="w-full py-3.5 px-5 bg-navy-800 disabled:bg-slate-300 disabled:cursor-not-allowed hover:bg-navy-900 text-white font-bold rounded-xl shadow transition">
+            تأكيد الإجابة
+          </button>
+        </div>
+
+        <!-- Immediate Feedback Banner -->
+        <div id="feedbackBox" class="hidden rounded-xl p-4 border-2 space-y-2">
+          <div class="flex items-center gap-2">
+            <span id="feedbackIcon" class="text-xl">✅</span>
+            <h4 id="feedbackTitle" class="font-extrabold text-base">إجابة صحيحة!</h4>
+          </div>
+          <p id="feedbackExplanation" class="text-sm leading-relaxed"></p>
+        </div>
+
+        <!-- Next Question Button -->
+        <div id="nextBtnWrapper" class="hidden pt-2">
+          <button id="nextQuestionBtn" onclick="nextQuestion()" class="w-full py-3.5 px-5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl shadow-md transition flex items-center justify-center gap-2 text-base">
+            <span id="nextBtnLabel">السؤال التالي</span>
+            <span>←</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 3: EXIT CONFIRMATION MODAL (No confirm()) -->
+    <div id="exitModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl space-y-4">
+        <h3 class="text-lg font-extrabold text-navy-900">هل تريد الخروج من الاختبار الحالي؟</h3>
+        <p class="text-sm text-slate-600">سيتم فقدان التقدم الحالي في هذه الجلسة والعودة إلى القائمة الرئيسية.</p>
+        <div class="flex items-center gap-3 pt-2">
+          <button onclick="goHome()" class="flex-1 py-2.5 px-4 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl transition">
+            نعم، خروج
+          </button>
+          <button onclick="closeExitModal()" class="flex-1 py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl transition">
+            إكمال الاختبار
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 4: FINAL RESULTS & REVIEW -->
+    <section id="resultsView" class="hidden space-y-6">
+      <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-md border border-slate-200 text-center space-y-5">
+        <div id="resultEmoji" class="text-5xl">🏆</div>
+        <div>
+          <span id="resultGroupBadge" class="px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700">المجموعة الأولى</span>
+          <h2 id="resultHeading" class="text-2xl sm:text-3xl font-extrabold text-navy-900 mt-2">مبارك! اجتزت الاختبار بنجاح</h2>
+          <p id="resultSubheading" class="text-sm text-slate-600 mt-1">أداء ممتاز، استمر في المراجعة لضمان الدرجة الكاملة</p>
+        </div>
+
+        <!-- Score Metrics -->
+        <div class="grid grid-cols-3 gap-3 max-w-lg mx-auto pt-2">
+          <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+            <span class="block text-xs text-slate-500">الدرجة النهائية</span>
+            <strong id="finalScoreText" class="text-xl sm:text-2xl font-extrabold text-navy-900">0 / 100</strong>
+          </div>
+          <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+            <span class="block text-xs text-slate-500">النسبة المئوية</span>
+            <strong id="finalPercentText" class="text-xl sm:text-2xl font-extrabold text-emerald-600">0%</strong>
+          </div>
+          <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+            <span class="block text-xs text-slate-500">الوقت المستغرق</span>
+            <strong id="finalTimeText" class="text-lg sm:text-xl font-extrabold text-slate-700">00:00</strong>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-wrap items-center justify-center gap-3 pt-3">
+          <button onclick="restartCurrentQuiz()" class="py-3 px-5 bg-navy-800 hover:bg-navy-900 text-white font-bold rounded-xl shadow transition">
+            ↻ إعادة نفس الاختبار
+          </button>
+          <button id="retrySessionWrongBtn" onclick="practiceSessionWrong()" class="hidden py-3 px-5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl shadow transition">
+            🎯 تدرب على أخطاء هذه الجلسة (<span id="sessionWrongCount">0</span>)
+          </button>
+          <button onclick="goHome()" class="py-3 px-5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl transition">
+            القائمة الرئيسية
+          </button>
+        </div>
+      </div>
+
+      <!-- Wrong Answers Detailed Review -->
+      <div id="wrongReviewSection" class="hidden space-y-4">
+        <h3 class="text-lg font-extrabold text-navy-900 flex items-center gap-2">
+          <span>📋 مراجعة الأسئلة التي أخطأت فيها</span>
+        </h3>
+        <div id="wrongReviewList" class="space-y-4">
+          <!-- Wrong question cards injected here -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500 mt-auto">
+    بنك الأسئلة الشامل لاختبار أساسيات مصرفية الأفراد — جميع الـ 302 سؤال محققة ومحدثة
+  </footer>
+
+  <script>
+    // =========================================================================
+    // قاعدة بيانات الأسئلة الكاملة (302 سؤال) من التجميعات والملفات المرفقة
+    // =========================================================================
+    const QUESTIONS_DB = [
+      { id: 1, q: "للوصول إلى أعلى درجات الالتزام يجب: (اختر ثلاث إجابات صحيحة)", options: ["زيادة نسبة المبيعات للحفاظ على العملاء", "ترسيخ قيم الأخلاق والنزاهة", "عمل التقارير الدورية للعملاء المشتبه بهم", "تعزيز القيادة القوية", "تجنب المخاطر بكافة أنواعها"], correct: [1, 2, 3], multi: 3, explanation: "الالتزام يركز على الثقافة الأخلاقية، القيادة الداعمة، والرقابة ورفع التقارير الدورية." },
+      { id: 2, q: "يتميز التوريق الإسلامي عن التوريق التقليدي بأنه:", options: ["يملك المستثمرون أصولاً غير حقيقية", "يملك المستثمرون أصولاً حقيقية وشبه حقيقية", "يملك المستثمرون أصولاً حقيقية سواء كانت أعياناً أو منافع", "يمكن تداول الصكوك الإسلامية المولدة للديون"], correct: [2], multi: 1, explanation: "الصكوك الإسلامية تمثل حصصاً شائعة في ملكية أصول حقيقية أو منافع بخلاف السندات التقليدية." },
+      { id: 3, q: "من أنواع مخططات احتيال بطاقة الائتمان: (اختر إجابتين صحيحتين)", options: ["سهولة الحصول على بطاقة الائتمان", "لا يمكن تعديل المعلومات على البطاقة", "الانتشار الواسع لمستخدمي بطاقة الائتمان", "بيع البطاقات إلى سارقين", "استخدام البطاقة من غير تفويض"], correct: [3, 4], multi: 2, explanation: "بيع البطاقات للسارقين واستخدامها دون تفويض من أبرز صور الاحتيال." },
+      { id: 4, q: "يمكن أن يكون مرتكبو الاحتيال المالي أشخاصاً:", options: ["من داخل البنك وخارجه", "من خارج البنك فقط", "من داخل البنك فقط", "من بنوك أخرى"], correct: [0], multi: 1, explanation: "ينقسم الاحتيال المالي إلى داخلي (موظفين/مديرين) وخارجي (عملاء أو أطراف خارجية)." },
+      { id: 5, q: "للخدمة المتميزة ثلاثة أسس هي:", options: ["نوع الخدمة، طبيعة طالب الخدمة، اسم الجهة التي تقدم الخدمة", "نوع الخدمة، مؤهل طالب الخدمة، اسم الجهة التي تقدم الخدمة", "نوع الخدمة، طبيعة طالب الخدمة، طبيعة مقدم الخدمة", "نوع الخدمة، طبيعة طالب الخدمة، مكان تقديم الخدمة"], correct: [2], multi: 1, explanation: "الأسس الثلاثة: نوع الخدمة، طبيعة طالب الخدمة، وطبيعة مقدم الخدمة." },
+      { id: 6, q: "يُعتبر مسؤول الالتزام الرقابي:", options: ["نقطة اتصال رئيسية بالجهات الرقابية", "مشرفاً على التعاملات المالية في الفروع", "المسؤول عن الهيكل التنظيمي لإدارة العمليات", "مدير العلاقة للحسابات عالية المخاطر"], correct: [0], multi: 1, explanation: "مسؤول الالتزام الرقابي هو نقطة الاتصال الرئيسية بين البنك والجهات الرقابية." },
+      { id: 7, q: "من مسؤوليات إدارة الالتزام، مساعدة الإدارة العليا على إدارة مخاطر عدم الالتزام من خلال وضع:", options: ["خطط إدارة مخاطر السيولة واعتمادها من قبل إدارة الخزينة", "الخطط الاستراتيجية للمصرف واعتمادها من قبل مجلس الإدارة", "سياسة إدارة المخاطر المالية واعتمادها من قبل الإدارة المالية", "سياسة الالتزام واعتمادها من قبل مجلس الإدارة"], correct: [3], multi: 1, explanation: "تضع إدارة الالتزام سياسة الالتزام ويتم اعتمادها من مجلس الإدارة." },
+      { id: 8, q: "يتم اعتماد سياسة الالتزام من قبل:", options: ["مجلس إدارة البنك", "رئيس إدارة الالتزام", "العضو المنتدب من البنك المركزي السعودي", "نائب الرئيس التنفيذي"], correct: [0], multi: 1, explanation: "مجلس إدارة البنك هو الجهة المخولة باعتماد سياسة الالتزام." },
+      { id: 9, q: "من أمثلة الاحتيال الداخلي:", options: ["استخدام صلاحيات لا تخص الموظف", "تزييف الأوراق النقدية", "تحويل أموال لعملاء وهميين", "تزوير مستندات الهوية"], correct: [2], multi: 1, explanation: "الإجابة المعتمدة في بنك الأسئلة لهذا السؤال هي: تحويل أموال لعملاء وهميين." },
+      { id: 10, q: "على الموظف في حال كشف عملية احتيال أن يقدم تقريراً يوضح فيه: (اختر ثلاث إجابات صحيحة)", options: ["رصيد المتهم المالي", "مكان الجريمة المزعومة", "مبلغ الاحتيال المزعوم", "مكان وطبيعة عمل المتهم", "تاريخ البلاغ ووقته"], correct: [1, 2, 3], multi: 3, explanation: "يشمل التقرير مكان الجريمة المزعومة، مبلغ الاحتيال، ومكان وطبيعة عمل المتهم." },
+      { id: 11, q: "مرحلة إخفاء المصدر غير المشروع للأموال في محاولة كسر حدة تتبع تلك الأموال وذلك باتخاذ معاملات معقدة لإخفائها، وتعرف هذه المرحلة بـ:", options: ["التغطية", "الصرف", "الدمج", "التحصيل"], correct: [0], multi: 1, explanation: "التغطية (أو التمويه) هي المرحلة الثانية لكسر تتبع مصدر الأموال." },
+      { id: 12, q: "المخاطر التي تنجم عنها عقوبات وإجراءات نظامية أو خسائر مالية أو إساءة لسمعة المصرف نتيجة لإخفاقه في تطبيق الأنظمة والتعليمات والقواعد والتعاميم والقيم السلوكية والأخلاقية التي يعمل المصرف من خلالها، هي:", options: ["مخاطر عدم الالتزام", "مخاطر السيولة", "مخاطر العمليات", "مخاطر السوق"], correct: [0], multi: 1, explanation: "هذا هو التعريف الدقيق لمخاطر عدم الالتزام." },
+      { id: 13, q: "يُعد تقديم المشورة وفق تعليمات البنك المركزي السعودي من مهام:", options: ["الإدارة القانونية", "إدارة العمليات", "إدارة الرقابة والجودة", "إدارة الالتزام"], correct: [3], multi: 1, explanation: "تقديم المشورة للإدارة والموظفين بشأن الأنظمة والتعليمات من مهام إدارة الالتزام." },
+      { id: 14, q: "تُعد من أنواع الأوراق التجارية بحسب نظام الأوراق التجارية السعودي: (اختر ثلاث إجابات صحيحة)", options: ["الاعتمادات المستندية", "الشيك", "الكمبيالات", "الوثائق", "السند لأمر"], correct: [1, 2, 4], multi: 3, explanation: "الأوراق التجارية في النظام السعودي محصورة في: الشيك، الكمبيالة، والسند لأمر." },
+      { id: 15, q: "دليل الالتزام هو دليل تعده إدارة الالتزام في كل بنك لتغطية:", options: ["مبادئ الالتزام", "عمليات الاحتيال المالي", "المخالفات", "مخاطر عدم الالتزام"], correct: [0], multi: 1, explanation: "يغطي دليل الالتزام مبادئ الالتزام وإجراءاته داخل البنك." },
+      { id: 16, q: "يُطلق على تعمد إعداد قوائم مالية لحساب يعلم مرتكبه حقيقة زيفه:", options: ["التزوير المحاسبي", "تزوير الوثائق", "التزوير الفني", "التزوير المعلوماتي"], correct: [0], multi: 1, explanation: "التلاعب المتعمد في القوائم والسجلات المالية يُسمى التزوير المحاسبي." },
+      { id: 17, q: "التلاعب بالفواتير واستخدام طرق التمويل التجاري والسلع يُعد من:", options: ["غسل الأموال عن طريق التجارة", "استخدام التحويلات البرقية الإلكترونية", "استخدام بطاقات الائتمان", "استخدام الأعمال الخارجية"], correct: [0], multi: 1, explanation: "هذا النمط يُعرف بغسل الأموال عن طريق التجارة." },
+      { id: 18, q: "هو نظام تتم فيه عملية الشراء بخصم المبلغ من حساب العميل إلى حساب التاجر فوراً:", options: ["سريع للحوالات المالية", "الصراف الآلي", "سويفت للحوالات المالية", "الدفع الإلكتروني عبر نقاط البيع"], correct: [3], multi: 1, explanation: "نقاط البيع (POS) تخصم مبلغ الشراء من حساب العميل لحساب التاجر فوراً." },
+      { id: 19, q: "إخفاق البنك في التقيد بتطبيق التعليمات والأنظمة والمعايير الأخلاقية قد يؤدي إلى:", options: ["منح البنك التراخيص المطلوبة من قبل الجهات الرقابية", "زيادة قاعدة العملاء والأرباح والمبيعات", "زيادة نسبة العملاء نظراً لمرونة سياسة البنك", "احتمال فقدان عملائه، وتأثر أرباحه ومبيعاته نتيجة لتأثر سمعته"], correct: [3], multi: 1, explanation: "مخاطر السمعة الناتجة عن عدم الالتزام تؤدي لفقدان العملاء وتراجع الأرباح." },
+      { id: 20, q: "من مزايا استخدام العميل لأجهزة الخدمات الذاتية:", options: ["عدم اطلاع البنك على الحركات المالية للعميل", "تقليل المخاطر على الحساب الشخصي للعميل", "إجراء العمليات المالية من غير حد أقصى", "تنفيذ بعض العمليات المالية خارج أوقات العمل الرسمي للبنك"], correct: [3], multi: 1, explanation: "تتيح أجهزة الخدمة الذاتية تنفيذ العمليات على مدار الساعة خارج أوقات عمل الفروع." },
+      { id: 21, q: "عند تلقي هدية يجب الإفصاح بشكل مكتوب لإدارة الالتزام إذا كانت الهدية: (اختر إجابتين صحيحتين)", options: ["لا تتناسب مع احتياج الموظف", "زهيدة الثمن", "قابلة للتلف", "لا يمكن بيعها", "تجاوزت قيمتها ألف ريال سعودي"], correct: [0, 4], multi: 2, explanation: "الإجابة المعتمدة في بنك الأسئلة: لا تتناسب مع احتياج الموظف، وتجاوزت قيمتها ألف ريال سعودي." },
+      { id: 22, q: "تُعد النوافذ الإسلامية في البنوك:", options: ["وحدة متخصصة تابعة للإدارة التنفيذية", "وحدة تابعة لإدارة المنتجات", "وحدة مستقلة قانونياً", "فرع مستقل عن المصرف"], correct: [0], multi: 1, explanation: "النافذة الإسلامية وحدة متخصصة داخل البنك التقليدي تتبع الإدارة التنفيذية." },
+      { id: 23, q: "حدد أهم خدمة يقدمها نظام \"سريع\":", options: ["إجراء قيود العمليات لحساب المستفيد وتحويل الأموال في اليوم نفسه", "خدمة تحصيل الشيكات المسحوبة على بنوك دولية", "خدمة سداد الفواتير المستحقة", "خدمة الحسم المباشر"], correct: [0], multi: 1, explanation: "نظام سريع يتيح التسوية الفورية والتحويل بين البنوك المحلية في اليوم نفسه." },
+      { id: 24, q: "يجب مراعاة الجوانب التالية عند إعداد دليل الالتزام: (اختر ثلاث إجابات صحيحة)", options: ["إتاحة قاعدة البيانات للعملاء لهدف التثقيف والتوعية", "توقيع الموظفين الجدد على إقرار يفيد قراءتهم للدليل", "إتاحة الدليل لجميع الموظفين على شبكة الإنترانت", "تحديث الدليل بصفة مستمرة", "نشر دليل الالتزام في الموقع الرسمي للبنك"], correct: [1, 2, 3], multi: 3, explanation: "توقيع الموظفين الجدد، إتاحته على الإنترانت الداخلي، وتحديثه باستمرار." },
+      { id: 25, q: "أي من الخيارات التالية يندرج ضمن مبدأ \"حماية خصوصية المعلومات\" الوارد ضمن المبادئ العامة لحماية عملاء المصارف؟", options: ["القدرة على البحث والمقارنة بين أفضل الخدمات", "كشف العمليات المحتملة لتضارب المصالح", "استقبال الشكاوى ومعالجتها", "وضع أنظمة رقابية على مستوى عالٍ لحماية بيانات العملاء"], correct: [3], multi: 1, explanation: "حماية الخصوصية تتطلب وضع أنظمة رقابية عالية المستوى لحماية سرية بيانات العملاء." },
+      { id: 26, q: "بدأ البنك المركزي السعودي مزاولة عمله في مدينة:", options: ["الرياض", "جدة", "الطائف", "الدمام"], correct: [1], multi: 1, explanation: "بدأ البنك المركزي السعودي (مؤسسة النقد سابقاً) مزاولة أعماله في مدينة جدة." },
+      { id: 27, q: "أساس هذا العقد أنه بيع لمنافع الأشياء مع بقاء أصولها في ملكية البائع؛ أي أن مالك الأصل يبيع بموجب هذا العقد منفعته أو الخدمة المنوطة بذلك الأصل، وهو:", options: ["عقد الاستصناع", "عقد الإجارة", "عقد السلم", "عقد المرابحة"], correct: [1], multi: 1, explanation: "الإجارة هي بيع المنفعة مع بقاء عين الأصل مملوكة للمؤجر." },
+      { id: 28, q: "يطبق البنك المركزي السعودي \"مبادئ حماية عملاء المصارف\" على:", options: ["أي طرف ثالث (خارجي) يستعان به من قبل المصارف", "المصارف المرخص لها وأي طرف ثالث (خارجي) يستعان به من قبل المصارف", "الحسابات الخاصة بكبار العملاء فقط", "المصارف المرخص لها فقط"], correct: [1], multi: 1, explanation: "تشمل المبادئ المصارف المرخصة وأي طرف ثالث تستعين به المصارف." },
+      { id: 29, q: "العميل أحمد، إجمالي دخله الشهري 16,500 ريال ويرغب في الحصول على تمويل عقاري بالإضافة إلى تمويله الشخصي السابق، ما يجب أن يعرفه العميل هو أن التزاماته الائتمانية الشهرية بعد حصوله على التمويل العقاري لن تتجاوز:", options: ["55% من إجمالي الدخل الشهري", "65% من إجمالي الراتب", "65% من إجمالي الدخل الشهري", "55% من إجمالي الراتب"], correct: [2], multi: 1, explanation: "الحد الأقصى لإجمالي الالتزامات الائتمانية شاملة العقاري هو 65% من إجمالي الدخل الشهري." },
+      { id: 30, q: "البنك الذي تملكه الدولة وتملك كامل رأس المال فيه وتشرف على أعماله وأنشطته هو:", options: ["البنك العام", "البنك التجاري", "البنك المختلط", "البنك الرقمي"], correct: [0], multi: 1, explanation: "البنك العام هو المملوك بالكامل للدولة." },
+      { id: 31, q: "من اختصاصات الإدارة العامة للتحريات المالية: (اختر ثلاث إجابات صحيحة)", options: ["استقطاب الموظفين المؤهلين وتدريبهم", "التواصل مع المشتبه بهم وأخذ المعلومات اللازمة", "تلقي البلاغات الواردة من المؤسسات المالية", "إعداد النماذج التي تستخدم في إبلاغ المؤسسات المالية", "التنسيق مع الجهات الرقابية"], correct: [2, 3, 4], multi: 3, explanation: "تختص بتلقي البلاغات، إعداد نماذج الإبلاغ، والتنسيق مع الجهات الرقابية." },
+      { id: 32, q: "منظمة دولية غير هادفة للربح تقوم بإعداد وإصدار معايير المحاسبة المالية والمراجعة والضبط وأخلاقيات العمل، وكذلك المعايير الشرعية للمالية الإسلامية:", options: ["المجلس العام للبنوك والمؤسسات المالية", "هيئة المحاسبة والمراجعة للمؤسسات المالية الإسلامية (أيوفي - AAOIFI)", "مجلس الخدمات المالية", "السوق المالية الإسلامية"], correct: [1], multi: 1, explanation: "هيئة المحاسبة والمراجعة للمؤسسات المالية الإسلامية (AAOIFI)." },
+      { id: 33, q: "من أهداف نظام سريع: (اختر ثلاث إجابات صحيحة)", options: ["تعزيز الأداء المالي وتنظيم المدفوعات المالية", "تقليل المخاطر المالية والاستغناء عن حمل النقد", "تقليص عدد الموظفين والأجهزة المستخدمة", "الحد من الحوالات بين البنوك تفادياً للخطأ", "خفض تكاليف الخدمات المالية"], correct: [0, 1, 4], multi: 3, explanation: "تعزيز الأداء المالي، تقليل المخاطر والاستغناء عن النقد، وخفض التكاليف." },
+      { id: 34, q: "هي أجهزة تفاعلية مع شاشات تعمل باللمس تسمح للعملاء بإجراء خدمات بنكية متعددة:", options: ["شبكة الفروع", "مراكز الاتصال", "نقاط البيع", "الخدمة الذاتية"], correct: [3], multi: 1, explanation: "أجهزة الخدمة الذاتية (Kiosks)." },
+      { id: 35, q: "من الهيئات الدولية التي تقوم بسن المعايير الدولية المرشدة في مجال مكافحة غسل الأموال وتمويل الإرهاب: (اختر ثلاث إجابات صحيحة)", options: ["منظمة التجارة العالمية", "المنظمة الدولية لمفوضي لجان الأوراق المالية", "لجنة بازل للرقابة على البنوك", "الأمم المتحدة", "صندوق النقد الدولي"], correct: [1, 2, 3], multi: 3, explanation: "المنظمة الدولية لمفوضي لجان الأوراق المالية، لجنة بازل، والأمم المتحدة." },
+      { id: 36, q: "أي معلومات أو بيانات أو أرقام حصل عليها أو اطلع عليها أي من منسوبي المؤسسة المالية بحكم طبيعة عمله أو بحكم انتمائه للمؤسسة هي:", options: ["معلومات العمل", "المعرفة العامة", "المعلومات الداخلية", "المعلومات العامة"], correct: [2], multi: 1, explanation: "تُعرف بالمعلومات الداخلية ويجب الحفاظ على سريتها." },
+      { id: 37, q: "تتميز المصارف الإسلامية عن المصارف التقليدية بـ:", options: ["حسم وتحصيل السندات عن طريق خصم الدين بالعين", "حسم وتحصيل السندات عن طريق خصم الفائدة", "حسم وتحصيل السندات بكافة الطرق", "حسم وتحصيل السندات مقابل فائدة ربوية"], correct: [0], multi: 1, explanation: "الإجابة المعتمدة في بنك الأسئلة لهذا السؤال هي الخيار الأول." },
+      { id: 38, q: "اللجنة المسؤولة عن ضمان الالتزام بالأنظمة والإشراف على عمليات البنك والتأكد من توافر نظام رقابي ومن دقة وعدالة البيانات المالية المعلنة هي:", options: ["لجنة المراجعة", "اللجنة التنفيذية", "لجنة إدارة المخاطر", "لجنة الترشيح والمكافآت"], correct: [0], multi: 1, explanation: "لجنة المراجعة تتولى الإشراف على الرقابة الداخلية ودقة البيانات المالية." },
+      { id: 39, q: "من صيغ التمويل الإسلامي: (اختر ثلاث إجابات صحيحة)", options: ["الأسهم الممتازة", "القرض بفائدة", "المشاركة", "المضاربة", "المرابحة"], correct: [2, 3, 4], multi: 3, explanation: "المشاركة، المضاربة، والمرابحة من صيغ التمويل الإسلامي الأساسية." },
+      { id: 40, q: "من أمثلة المنافذ غير المباشرة ما يلي:", options: ["موظف خدمة العملاء في البنك", "مراكز تحويل الأموال", "نظام الوكالة المصرفية", "الفروع الرئيسية الإدارية"], correct: [2], multi: 1, explanation: "نظام الوكالة المصرفية يُعد من منافذ التوزيع غير المباشرة." },
+      { id: 41, q: "هو خطاب الضمان الذي يحق للجهة صاحبة المشروع حجز نسبة مئوية من استحقاقات المتعهد وله أن يتقدم بكفالة مقابلة، ويعرف بـ:", options: ["خطاب الضمان الابتدائي", "خطاب ضمان حسن التنفيذ", "خطاب الضمان النهائي", "خطاب ضمان الدفعة المقدمة"], correct: [2], multi: 1, explanation: "خطاب الضمان النهائي." },
+      { id: 42, q: "ينبغي للمصرف عدم إرسال مواد تسويقية لمنتجات ائتمانية للعملاء من فئة:", options: ["الأمي والكفيف", "المنتسبون للبنك", "الشركات الصغيرة والمتوسطة", "الأفراد أقل من 18 سنة"], correct: [3], multi: 1, explanation: "القُصّر أقل من 18 سنة لا يجوز تسويق المنتجات الائتمانية لهم." },
+      { id: 43, q: "للحد من حدوث احتيال في التحويل البرقي (الإلكتروني) يجب: (اختر إجابتين صحيحتين)", options: ["تخفيض رسوم طلبات التحويل", "مراجعة جميع المعاملات بنهاية كل يوم", "سرعة إنجاز التحويل", "تمرير طلبات التحويل يدوياً", "مطابقة جميع الحسابات التي تأثرت بالتحويلات البرقية (الإلكترونية) من قبل موظفي البنك الذين لم يشاركوا في عملية التحويل البرقي (الإلكتروني)"], correct: [1, 4], multi: 2, explanation: "المراجعة اليومية ومطابقة الحسابات من موظفين مستقلين لم يشاركوا في التنفيذ." },
+      { id: 44, q: "من أنواع مخططات احتيال بطاقة الائتمان: (اختر إجابتين صحيحتين)", options: ["سهولة الحصول على بطاقة الائتمان", "لا يمكن تعديل المعلومات على البطاقة", "الانتشار الواسع لمستخدمي بطاقة الائتمان", "بيع البطاقات إلى سارقين", "استخدام البطاقة من غير تفويض"], correct: [3, 4], multi: 2, explanation: "بيع البطاقات للسارقين واستخدامها من غير تفويض." },
+      { id: 45, q: "يمكن تعريف سلوك العمل بأنه:", options: ["الأسس والضوابط الخاصة بإدارات المنظمة", "مجموعة المعايير والضوابط الأخلاقية للعاملين", "اللوائح الصادرة عن الجهات الرقابية الخاصة بحماية العملاء", "مجموعة المعايير المساعدة في تحقيق استراتيجيات المنظمة"], correct: [1], multi: 1, explanation: "سلوك العمل هو مجموعة المعايير والضوابط الأخلاقية والمهنية للعاملين." },
+      { id: 46, q: "من الأمور الأساسية التي يجب على موظف البنك معرفتها:", options: ["شروط ومتطلبات الخدمة", "المنتجات التي يطمح البنك لابتكارها", "القضايا المثارة في مجلس الإدارة", "عدد عملاء البنك"], correct: [0], multi: 1, explanation: "يجب على الموظف الإلمام التام بشروط ومتطلبات الخدمة المقدمة للعملاء." },
+      { id: 47, q: "من طرق احتيال التحويل البرقي (الإلكتروني): (اختر إجابتين صحيحتين)", options: ["التفويضات المزورة", "أنظمة التحويل المتطورة", "موظفين أكفاء", "الدخول غير المفوض واعتراض البث", "وجود كلمة أمان صعبة"], correct: [0, 3], multi: 2, explanation: "التفويضات المزورة والدخول غير المفوض واعتراض البث." },
+      { id: 48, q: "يُسمح للمقيمين بفتح حسابات ....... والاستفادة من الخدمات التي تقدمها البنوك السعودية وفقاً للشروط:", options: ["بالعملات الأجنبية فقط", "بالعملات المعتمدة في بلده فقط", "بالريال السعودي والعملات الأجنبية", "بالريال السعودي فقط"], correct: [2], multi: 1, explanation: "يُسمح للمقيمين بفتح حسابات بالريال السعودي والعملات الأجنبية." },
+      { id: 49, q: "هو ضمان التأكد من تطبيق التعليمات والإجراءات والعمليات المالية وتنفيذها وفقاً للأنظمة والقواعد والتعليمات الصادرة من الجهات الرقابية:", options: ["مفهوم الالتزام", "مفهوم المسؤولية", "مفهوم مكافحة الاحتيال المالي", "مفهوم النزاهة"], correct: [0], multi: 1, explanation: "مفهوم الالتزام." },
+      { id: 50, q: "يُعد تحويل النقد المودع إلى شيكات سياحية صورة من عملية:", options: ["الدمج", "الإحلال", "التغطية", "التهريب"], correct: [1], multi: 1, explanation: "تُعد صورة من عملية الإحلال (الإيداع) وفق المنهج المعتمد." },
+      { id: 51, q: "هو تنظيم جديد لتوحيد أرقام حسابات العملاء في مختلف البنوك لتتوافق مع التنظيم الدولي لأرقام الحسابات المصرفية:", options: ["الرقم الدولي للحساب البنكي", "نظام تسوية الأوراق المالية", "شبكة مدى", "غرف المقاصة الآلية"], correct: [0], multi: 1, explanation: "الرقم الدولي للحساب البنكي (IBAN)." },
+      { id: 52, q: "ينبغي للمصارف حماية ودائع العملاء، والمدخرات، وغيرها من الأصول المالية المشابهة، ومراقبتها بوضع أنظمة رقابية ذات مستوى عالٍ من الكفاءة والفعالية للحد من:", options: ["فتح حساب لدى مصرفين مختلفين", "عمليات الاحتيال والاختلاس", "استخدام قنوات البنك الإلكترونية", "التحويل إلى حساب دولي"], correct: [1], multi: 1, explanation: "الحد من عمليات الاحتيال والاختلاس وإساءة الاستخدام." },
+      { id: 53, q: "بيع لمنافع الأشياء مع بقاء أصولها في ملكية البائع يُسمى:", options: ["مضاربة", "سلم", "بيع", "إجارة"], correct: [3], multi: 1, explanation: "عقد الإجارة." },
+      { id: 54, q: "يُشار إلى التقنيات أو الطرق المختلفة المستخدمة في غسل الأموال أو تمويل الإرهاب عادة بعبارة:", options: ["المستويات", "المسارات", "الأنماط", "الأخبار"], correct: [2], multi: 1, explanation: "تُسمى الأنماط (Typologies)." },
+      { id: 55, q: "يُصدر كشف الحساب الجاري بشكل:", options: ["سنوي", "ربع سنوي", "شهري", "نصف سنوي"], correct: [2], multi: 1, explanation: "يُصدر كشف الحساب الجاري شهرياً." },
+      { id: 56, q: "من مراحل غسل الأموال، استخدام الأموال في أنشطة أخرى يمكن أن تولد دخلاً مستمراً ربما يستخدم لتمويل جرائم أخرى أو يستفاد منها في مراحل زمنية لاحقة، يُطلق على هذه المرحلة:", options: ["الدمج", "التحصيل", "التمويه", "الصرف"], correct: [0], multi: 1, explanation: "مرحلة الدمج هي المرحلة النهائية لإعادة الأموال للاقتصاد المشروع." },
+      { id: 57, q: "عند اكتشاف جريمة مالية مرتكبة من قبل المؤسسة المالية، فإنه يحق للجهة الرقابية:", options: ["منع مرتكب المخالفة من العمل تحت أي جهة حكومية", "إيقاف المدراء عن جميع أعمالهم الشخصية", "سجن رئيس مجلس الإدارة", "فرض غرامة مالية تقدر بخمسة ملايين ريال سعودي"], correct: [3], multi: 1, explanation: "فرض غرامة مالية تصل إلى خمسة ملايين ريال سعودي." },
+      { id: 58, q: "يصح قبول الموظف لهدية من العميل بشرط أن تكون:", options: ["نقدية ولا تتجاوز قيمتها مئة ألف ريال", "مرتبطة بمنصب وظيفي معين", "ذات قيمة متعارف على تقديمها", "هادفة لتحقيق مصلحة عامة"], correct: [2], multi: 1, explanation: "أن تكون عينية رمزية ذات قيمة متعارف على تقديمها ولا تؤثر على الحياد." },
+      { id: 59, q: "اتفاقية أو عقد بين المصرف الإسلامي والعميل للمساهمة في رأس المال بنسب متساوية أو متفاوتة لتمويل مشروع قائم:", options: ["مفهوم السلم", "مفهوم البيوع", "مفهوم المضاربة", "مفهوم المشاركة"], correct: [3], multi: 1, explanation: "مفهوم المشاركة." },
+      { id: 60, q: "في أي من صيغ التمويل المتوافق مع أحكام الشريعة الإسلامية يدخل المصرف شريكاً في الملكية وفي الربح المتوقع بناءً على نسب متفق عليها، في حين يتحمل كل شريك الخسارة على قدر مساهمته في رأس المال:", options: ["المشاركة", "السلم", "المضاربة", "المرابحة"], correct: [0], multi: 1, explanation: "المشاركة: الربح حسب الاتفاق والخسارة على قدر المساهمة في رأس المال." },
+      { id: 61, q: "هي تحويل مبلغ مالي محدد بنمط متكرر إلى مكان معين:", options: ["خدمة حسابات الادخار", "خدمة الشيكات المصرفية", "خدمة الحوالات الدولية", "خدمة التحويل المستمر (الأمر المستديم)"], correct: [3], multi: 1, explanation: "خدمة التحويل المستمر (الأمر المستديم)." },
+      { id: 62, q: "يمكن تعريف الاحتيال هنا بأنه استخدام الخداع للحصول على منفعة دون وجه حق. ويشتمل هذا التعريف على: (اختر إجابتين صحيحتين)", options: ["مطالبة الموظف بالترقية", "تعمد المحاسبة بشكل خاطئ", "مطالبة الموظف بعلاوة", "أي عمل كاذب", "تكوين العلاقات أثناء العمل"], correct: [1, 3], multi: 2, explanation: "تعمد المحاسبة بشكل خاطئ وأي عمل كاذب." },
+      { id: 63, q: "من البيانات الشخصية التي يجب جمعها والتحقق من صحتها عند تأسيس أي علاقة جديدة مع أي عميل تحت مبدأ \"اعرف عميلك\" هي:", options: ["تعريف من جهة العمل", "نوع ورقم وتاريخ انتهاء صلاحية الهوية الوطنية", "نوع مسكن العميل", "حالة العميل الاجتماعية"], correct: [1], multi: 1, explanation: "التحقق من نوع ورقم وتاريخ انتهاء صلاحية الهوية الوطنية." },
+      { id: 64, q: "عند اكتشاف جريمة مالية مرتكبة من قبل المؤسسة المالية، فإنه يحق للجهة الرقابية:", options: ["إصدار إنذار كتابي بالمخالفة المرتكبة", "إيقاف المدراء عن جميع أعمالهم الشخصية", "منع مرتكب المخالفة من العمل تحت أي جهة حكومية", "فرض غرامة مالية تقدر بستة ملايين ريال سعودي"], correct: [0], multi: 1, explanation: "إصدار إنذار كتابي بالمخالفة المرتكبة." },
+      { id: 65, q: "يُصدر مجلس الإدارة وثيقة تتضمن إنشاء إدارة التزام، ويكون تقييم برنامج الالتزام بشكل:", options: ["ربع سنوي", "نصف سنوي", "كل 3 سنوات", "سنوي"], correct: [3], multi: 1, explanation: "يُقيّم برنامج الالتزام بشكل سنوي." },
+      { id: 66, q: "تتميز المصارف الإسلامية عن المصارف التقليدية بـ:", options: ["إصدار الأسهم على أساس اقتصادي بحت", "إصدار جميع أنواع الأسهم", "عدم إصدار أسهم ممتازة", "إصدار أسهم ممتازة محددة الفائدة"], correct: [2], multi: 1, explanation: "المصارف الإسلامية لا تصدر أسهماً ممتازة ذات عائد مضمون أو أولوية في رأس المال." },
+      { id: 67, q: "تمر جريمة غسل الأموال بثلاث مراحل: (اختر ثلاث إجابات صحيحة)", options: ["الدمج", "الصرف", "التحصيل", "التغطية", "الإيداع"], correct: [0, 3, 4], multi: 3, explanation: "الإيداع، التغطية، والدمج." },
+      { id: 68, q: "من شروط فتح الحساب الجاري للأشخاص الطبيعيين (السعوديين ومواطني دول مجلس التعاون):", options: ["سريان صلاحية إثبات الهوية المقدمة", "سريان مدة جواز السفر", "سريان عقد العمل", "سريان مدة السجل التجاري"], correct: [0], multi: 1, explanation: "سريان صلاحية إثبات الهوية المقدمة شرط أساسي." },
+      { id: 69, q: "من أمثلة الأنشطة الإجرامية التي ينتج عنها عمليات غسل أموال:", options: ["البيع والشراء في السلع المستعملة", "التهرب الضريبي", "التجارة الإلكترونية", "بيع الأسلحة بين الدول"], correct: [1], multi: 1, explanation: "التهرب الضريبي من الجرائم الأصلية لغسل الأموال." },
+      { id: 70, q: "من أمثلة الأنشطة الإجرامية التي ينتج عنها عمليات غسل أموال:", options: ["البيع والشراء في السلع المستعملة", "التجارة الإلكترونية", "بيع الأسلحة بين الدول", "النصب في الأموال العامة التابعة للجهات الحكومية"], correct: [3], multi: 1, explanation: "النصب والاختلاس في الأموال العامة." },
+      { id: 71, q: "إصدار وثائق أو شهادات مالية متساوية القيمة، تمثل حصصاً شائعة في ملكية موجودات قائمة فعلاً، أو سيتم إنشاؤها من حصيلة الاكتتاب، وتصدر وفق عقد شرعي وتأخذ أحكامه:", options: ["التوريق التقليدي", "التوريق الإسلامي", "السندات", "الأسهم الممتازة"], correct: [1], multi: 1, explanation: "التوريق الإسلامي (الصكوك)." },
+      { id: 72, q: "عرّف دليل مكافحة غسل الأموال الصادر عن البنك المركزي السعودي \"الأموال\" بأنها:", options: ["الممتلكات المادية فقط", "الأموال الناشئة خارج المملكة العربية السعودية", "الموارد الاقتصادية أياً كانت قيمتها أو نوعها", "الوثائق والصكوك المعتمدة لدى البنك المركزي السعودي فقط"], correct: [2], multi: 1, explanation: "الموارد الاقتصادية أياً كانت قيمتها أو نوعها أو طريقة امتلاكها." },
+      { id: 73, q: "المبادئ الصادرة عن لجنة بازل للإشراف على البنوك تُعد:", options: ["مهام إدارة العمليات", "مهام الالتزام", "مهام إدارة الحسابات", "مسؤولية الإدارة المالية"], correct: [1], multi: 1, explanation: "تُعد من مهام الالتزام." },
+      { id: 74, q: "للتسجيل على خدمة الإنترنت المصرفي لابد من توفر:", options: ["رقم هاتف العميل", "اسم المستخدم وكلمة المرور", "حساب نشط في سداد", "رقم الحساب الدولي الموحد"], correct: [1], multi: 1, explanation: "اسم المستخدم وكلمة المرور." },
+      { id: 75, q: "للحاج الأجنبي الممنوح له بطاقة تعريف خاصة بالحاج الصادرة من وزارة الحج:", options: ["لا يُسمح له بفتح حساب", "معاملته كالمواطن في فتح الحسابات", "فتح حساب بنكي دائم", "فتح حساب بنكي مؤقت"], correct: [3], multi: 1, explanation: "يُسمح للحاج الأجنبي بفتح حساب بنكي مؤقت." },
+      { id: 76, q: "تُصدرها البنوك بالتعاون مع شركات البطاقات الدولية، وتُستخدم البطاقة من قبل حاملها للحصول على المال بشكل مسبق:", options: ["بطاقة الخصم الشهري", "البطاقة الائتمانية", "خدمة التحويل المستمر", "بطاقة الصراف الآلي"], correct: [1], multi: 1, explanation: "البطاقة الائتمانية." },
+      { id: 77, q: "يجب على موظف البنك رفض صرف الشيك وإصدار ورقة اعتراض للمستفيد عند:", options: ["عدم وجود حساب للمستفيد من الشيك لدى البنك الآخر", "عدم وجود حساب للمستفيد من الشيك لدى نفس البنك", "عدم ذكر عنوان السكن لساحب الشيك", "عدم وجود تاريخ للشيك"], correct: [3], multi: 1, explanation: "عدم وجود تاريخ للشيك يُبطل صحته كشيك ويستوجب رفض صرفه." },
+      { id: 78, q: "\"استخدام هذه الأموال غير المشروعة للاستثمار في الأعمال المشروعة\" يُعد من أحد الطرق المتعارف عليها عند مرتكبي غسل الأموال وهو تعريف:", options: ["التشغيل", "التحصيل", "الدمج", "التمويل"], correct: [2], multi: 1, explanation: "مرحلة الدمج." },
+      { id: 79, q: "الممنوع بموجب صك شرعي، يُعرف بـ:", options: ["الوكيل", "المحجور عليه", "الوصي", "الولي"], correct: [1], multi: 1, explanation: "المحجور عليه هو الممنوع من التصرف في ماله بموجب صك شرعي." },
+      { id: 80, q: "يجوز لساحب الشيك أو لحامله أن يشترط عدم وفائه نقداً بأن يضع على صدره عبارة:", options: ["يُصرف لحامله فقط", "الشيك ملغى", "للقيد في الحساب", "يُصرف نقداً فقط"], correct: [2], multi: 1, explanation: "عبارة (للقيد في الحساب) تمنع صرف الشيك نقداً وتوجب إيداعه في الحساب." },
+      { id: 81, q: "يبدأ تطبيق مبدأ \"اعرف عميلك\" عادة بتحديد:", options: ["مؤهلات العميل", "عنوان العميل", "جهة عمل العميل", "هوية العميل"], correct: [3], multi: 1, explanation: "يبدأ بتحديد هوية العميل والتحقق منها." },
+      { id: 82, q: "من أمثلة الأنشطة الإجرامية التي ينتج عنها عمليات غسل أموال:", options: ["البيع والشراء في السلع المستعملة", "التجارة الإلكترونية", "بيع الأسلحة بين الدول", "التجارة في المخدرات"], correct: [3], multi: 1, explanation: "التجارة في المخدرات." },
+      { id: 83, q: "ضخ الأموال في القنوات الاستثمارية المختلفة من أهم الأدوار التي تؤديها البنوك الإسلامية؛ إذ تعتمد على مجموعة من أدوات استخدام الأموال المستمدة من الفقه الإسلامي، والتي تقوم بصفة أساسية على مفهوم:", options: ["الاستثمار في مجال محرم", "التقسيط بفوائد", "المشاركة والاحتكار", "المشاركة والبيوع"], correct: [3], multi: 1, explanation: "المشاركة والبيوع الشرعية." },
+      { id: 84, q: "ليكون الشيك صحيحاً لابد من توفر البيانات التالية: (اختر ثلاث إجابات صحيحة)", options: ["مبلغ الشيك بالحروف والأرقام", "أرقام تواصل المستفيد", "عنوان المستفيد", "توقيع ساحب الشيك", "تاريخ الشيك"], correct: [0, 3, 4], multi: 3, explanation: "مبلغ الشيك بالحروف والأرقام، توقيع الساحب، وتاريخ الشيك." },
+      { id: 85, q: "في حال اختلاف المبلغ المدون على الشيك بالحروف عن الأرقام لمرة واحدة، فإنه يتم اعتماد:", options: ["أيهما أقل", "لا يتم صرف الشيك", "المبلغ المكتوب بالحروف", "المبلغ المكتوب بالأرقام"], correct: [2], multi: 1, explanation: "تكون العبرة بالمبلغ المكتوب بالحروف." },
+      { id: 86, q: "تخضع الالتزامات الائتمانية المترتبة على التمويل لسياسات:", options: ["هيئة السوق المالية", "جهة التمويل", "وزارة المالية", "صندوق الاستثمارات العامة"], correct: [1], multi: 1, explanation: "تخضع لسياسات جهة التمويل وفق ضوابط البنك المركزي." },
+      { id: 87, q: "على الممول فحص السجل الائتماني للعميل بعد موافقته للتحقق من:", options: ["ملاءة العميل المالية وقدرته على تحمل الالتزامات الائتمانية الشهرية وسلوكه الائتماني", "قدرة العميل للحصول على أعلى مبلغ تمويل", "رفع جميع التعثرات المالية في السجل الائتماني", "استمرارية دفع الأقساط الشهرية للعميل لفترة ثلاثة أشهر متتالية وخمسة أشهر متفرقة"], correct: [0], multi: 1, explanation: "التحقق من ملاءة العميل المالية وقدرته على التحمل وسلوكه الائتماني." },
+      { id: 88, q: "هناك عدة مبادئ حاكمة قامت عليها المصرفية الإسلامية ومنها:", options: ["توجيه الموارد المالية إلى قنوات النشاط الاقتصادي الحقيقي النافع للمجتمع", "الإفراط في تكديس وتجميع المقتنيات", "الاستثمار في مجالات محرمة تحريماً قاطعاً", "الاستثمار في مجالات محرمة تحريماً جزئياً"], correct: [0], multi: 1, explanation: "توجيه الموارد للنشاط الاقتصادي الحقيقي النافع للمجتمع." },
+      { id: 89, q: "عند اكتشاف جريمة مالية مرتبطة بعمليات غسل أموال وتمويل إرهاب ومرتكبة من قبل المؤسسة المالية، فإنه يحق للجهة الرقابية:", options: ["فرض غرامة مالية تقدر بستة ملايين ريال سعودي", "منع مرتكب المخالفة من العمل تحت أي جهة حكومية", "سجن رئيس مجلس الإدارة", "إيقاف النشاط"], correct: [3], multi: 1, explanation: "إيقاف النشاط أو تعليقه من صلاحيات الجهة الرقابية." },
+      { id: 90, q: "ينبغي للمصرف إيضاح حقوق كل طرف، ومسؤولياته، وتفاصيل الأسعار والعمولات التي يتقاضاها المصرف، والغرامات والمخاطر، وآلية إنهاء العلاقة، وما يترتب عليها، بناءً على مبدأ:", options: ["التوعية والتثقيف المالي", "المعاملة بعدل وإنصاف", "الإفصاح والشفافية", "تضارب المصالح"], correct: [2], multi: 1, explanation: "مبدأ الإفصاح والشفافية." },
+      { id: 91, q: "من المسؤوليات الواجبة على العميل تجاه المصرف: (اختر ثلاث إجابات صحيحة)", options: ["تضارب المصالح", "الإخلال بالأحكام والشروط عن استخدام المنتج", "قراءة كافة معلومات الوثيقة بدقة", "الصدق في تقديم المعلومات الشخصية", "تحديث المعلومات بشكل دوري"], correct: [2, 3, 4], multi: 3, explanation: "قراءة الوثيقة بدقة، الصدق في المعلومات، وتحديثها دورياً." },
+      { id: 92, q: "ينبغي على المصرف إشعار العميل برسوم استخدام بطاقة الصرف الآلي عند:", options: ["الشراء عن طريق نقاط البيع", "إيداع مبالغ باهظة عن طريق الصراف الآلي", "التأخر في الرد على العميل", "إجراء عمليات السحب خارج المملكة العربية السعودية"], correct: [3], multi: 1, explanation: "عند إجراء عمليات السحب النقدي خارج المملكة." },
+      { id: 93, q: "في حال استخدام العميل للبطاقات الائتمانية لدى نقاط البيع فإنه:", options: ["يحق للتاجر فرض رسوم إضافية ضمن مبلغ الفاتورة", "يحق للتاجر منع العميل من استخدام البطاقة", "لا يحق للتاجر فرض أي رسوم إضافية", "يحق للمصرف احتساب رسوم إضافية على العميل"], correct: [2], multi: 1, explanation: "يُحظر على التاجر فرض أي رسوم إضافية على العميل عند الدفع بالبطاقة." },
+      { id: 94, q: "في حال واجه الموظفون موقفاً يخيرون فيه بين مصالحهم الشخصية أو مصالح العمل أو البنك يكون ذلك:", options: ["تبادل مصالح", "استغلال مصالح", "تعارض مصالح", "تحديد مصالح"], correct: [2], multi: 1, explanation: "تعارض (تضارب) مصالح." },
+      { id: 95, q: "من الأمور الأساسية التي يجب على موظف البنك معرفتها:", options: ["عدد عملاء البنك", "القضايا المثارة في مجلس الإدارة", "المنتجات التي يطمح البنك لابتكارها", "طريقة احتساب النسب"], correct: [3], multi: 1, explanation: "معرفة طريقة احتساب النسب والرسوم على المنتجات." },
+      { id: 96, q: "مسؤولية تجاوز نسبة تحمل الالتزامات الائتمانية للعميل عن الحد المسموح به بموجب مبادئ التمويل المسؤول تقع على عاتق:", options: ["العميل", "سمة", "جهة العمل", "جهة التمويل"], correct: [3], multi: 1, explanation: "تتحمل جهة التمويل المسؤولية الكاملة عن الالتزام بنسب التحمل." },
+      { id: 97, q: "لقياس إمكانية التحمل للعميل، على الممول أن يضمن الموازنة بين:", options: ["الكفاءة والفعالية في النماذج والأدوات المالية المستخدمة", "المصاريف الأساسية مقارنة بمستوى الدخل للعميل", "المصاريف الأساسية وفقاً لعدد المعالين", "مصاريف التأمين للعميل شخصياً ولمن يعولهم"], correct: [1], multi: 1, explanation: "الموازنة بين المصاريف الأساسية ومستوى الدخل للعميل." },
+      { id: 98, q: "عند قيام أحد الأشخاص باستخدام الخداع للحصول على منفعة دون وجه حق يسمى ذلك:", options: ["منفعة", "سطو", "خدمة", "احتيال"], correct: [3], multi: 1, explanation: "تعريف الاحتيال." },
+      { id: 99, q: "للمحافظة على العملاء يجب أن ينصب اهتمام المسؤولين في البنوك على جودة الخدمة المقدمة لما لها من أهمية كبيرة في الحفاظ على العملاء الحاليين، وجذب عملاء جدد. ولتحقيق ذلك في تقديم الخدمات المصرفية يجب: (اختر ثلاث إجابات صحيحة)", options: ["الاهتمام بالعملاء", "تجاهل أخطاء الخدمة", "زيادة مدة انتظار العميل", "تلبية رغبات العملاء وفقاً لاحتياجاتهم", "إقناع العميل ومعالجة الاعتراضات لديه"], correct: [0, 3, 4], multi: 3, explanation: "الاهتمام بالعملاء، تلبية رغباتهم، وإقناعهم ومعالجة اعتراضاتهم." },
+      { id: 100, q: "ينبغي على المصارف حماية ومراقبة ودائع العملاء والمدخرات وغيرها من الأصول المالية المشابهة من خلال وضع أنظمة رقابية ذات مستوى عالٍ من الكفاءة والفعالية للحد من عمليات الاحتيال والاختلاس أو إساءة الاستخدام، تندرج هذه العبارة تحت أي مبدأ من مبادئ حماية عملاء المصارف؟", options: ["معالجة الشكاوى", "حماية خصوصية المعلومات", "الحماية ضد عمليات الاحتيال", "تضارب المصالح"], correct: [2], multi: 1, explanation: "مبدأ الحماية ضد عمليات الاحتيال." },
+      { id: 101, q: "اللغة المستخدمة في الأحكام والشروط الخاصة بطلب الحصول على منتج أو خدمة:", options: ["اللغة العربية فقط", "اللغة العربية وإتاحة اللغة الإنجليزية عند الطلب", "اللغة الإنجليزية فقط", "اللغة العربية أو الإنجليزية"], correct: [1], multi: 1, explanation: "تكون باللغة العربية مع إتاحة نسخة باللغة الإنجليزية عند الطلب." },
+      { id: 102, q: "تتمثل في إدراك أهمية فهم حاجات العملاء والمستفيدين، ورغباتهم، وتوقعاتهم، وتبدأ من أسلوب استقبالهم والترحيب بهم، وانتقاء عبارات لبقة عند التعامل معهم، والتبسم في وجوههم، والتعرف عليهم؛ هي:", options: ["المهارات القيادية", "المهارات الفنية", "المهارات التنظيمية", "المهارات السلوكية"], correct: [3], multi: 1, explanation: "المهارات السلوكية." },
+      { id: 103, q: "في حال التوقيع على نموذج غير مكتمل، تقع المسؤولية على:", options: ["البنك المركزي السعودي", "العميل", "هيئة السوق المالية", "المصرف"], correct: [1], multi: 1, explanation: "يتحمل العميل مسؤولية توقيعه على أي نموذج غير مكتمل البيانات." },
+      { id: 104, q: "من صور عمليات الاحتيال على بطاقة الائتمان: (اختر إجابتين صحيحتين)", options: ["استخدام المفوض للبطاقة في الدول الأجنبية", "استخدام المفوض للبطاقة في دول مجلس التعاون الخليجي", "استخدام غير المفوض للبطاقة الائتمانية", "الكشط واللصق", "استخدام المفوض للبطاقة عبر الإنترنت"], correct: [2, 3], multi: 2, explanation: "الاستخدام غير المفوض للبطاقة، والكشط واللصق (Skimming)." },
+      { id: 105, q: "من مزايا استخدام العميل لأجهزة الخدمات الذاتية:", options: ["عدم اطلاع البنك على الحركات المالية للعميل", "تقليل المخاطر على الحساب الشخصي للعميل", "إجراء العمليات المالية من غير حد أقصى", "تنفيذ بعض العمليات المالية خارج أوقات العمل الرسمي للبنك"], correct: [3], multi: 1, explanation: "تنفيذ العمليات خارج أوقات العمل الرسمي للبنك." },
+      { id: 106, q: "يتم تقسيم البنوك إلى بنوك تجارية وبنوك صناعية، وذلك حسب:", options: ["من حيث الوضع القانوني للبنك", "من حيث طبيعة الأعمال التي تزاولها البنوك", "من حيث مصادر الأموال", "من حيث طبيعة العمليات"], correct: [1], multi: 1, explanation: "تصنيف البنوك حسب طبيعة الأعمال التي تزاولها." },
+      { id: 107, q: "من القنوات غير المباشرة لتوزيع الخدمات المصرفية: (اختر إجابتين صحيحتين)", options: ["الفروع", "عمليات المقاصة", "التوكيلات المصرفية", "جميع القنوات المستخدمة مباشرة", "جميع القنوات المستخدمة غير مباشرة"], correct: [2, 4], multi: 2, explanation: "التوكيلات المصرفية وجميع القنوات المستخدمة غير مباشرة." },
+      { id: 108, q: "على كل بنك أن يحتفظ لدى البنك المركزي السعودي بوديعة نظامية لا تقل عن:", options: ["7%", "10%", "15%", "20%"], correct: [2], multi: 1, explanation: "15% من التزامات الودائع وفقاً لنظام مراقبة البنوك." },
+      { id: 109, q: "يحظر على أي بنك إعطاء قرض أو تسهيلات ائتمانية أو كفالة أو ضمان أو تحمل التزام مالي بمبالغ تتجاوز من مجموع احتياطيات البنك ورأس ماله المدفوع أو المستثمر، ما نسبته:", options: ["10%", "15%", "20%", "25%"], correct: [3], multi: 1, explanation: "لا يجوز أن يتجاوز 25% من مجموع احتياطيات البنك ورأس ماله المدفوع." },
+      { id: 110, q: "هي الحسابات التي تتضمن معاملات متبادلة بين البنوك وطرف آخر، وقد يتمثل الطرف الآخر في شخص أو أشخاص طبيعيين (أفراد) أو في أشخاص اعتباريين (شركات وهيئات وبنوك أخرى):", options: ["حسابات جارية", "حسابات الادخار", "حسابات الودائع الثابتة", "الودائع بإخطار"], correct: [0], multi: 1, explanation: "الحسابات الجارية." },
+      { id: 111, q: "تلجأ البنوك التجارية إلى تشجيع العملاء على الادخار بفتح حسابات توفير لهؤلاء العملاء، بحيث تمنحهم بعض المميزات مثل دفع نسبة عائد سنوي محدد لا تتجاوز .... عن المبالغ التي يحتفظ بها العملاء في حسابات الادخار:", options: ["1%", "2%", "3%", "4%"], correct: [1], multi: 1, explanation: "2% بحسب المنهج المعتمد." },
+      { id: 112, q: "من العملاء من يجد نفسه في غير حاجة إلى مبلغ معين من المال مدة زمنية معينة مقابل فائدة ويرغب في استثمار هذه المبالغ طوال مدة عدم حاجته إليها، ولذا يودع هذا المبلغ في أحد الحسابات مقابل الحصول على عائد معين:", options: ["حسابات جارية", "حسابات الادخار", "حسابات الودائع الثابتة", "الودائع بإخطار"], correct: [2], multi: 1, explanation: "حسابات الودائع الثابتة (لأجل)." },
+      { id: 113, q: "يمكن للشركة حسب حاجتها أن تفتح حساباً بالدولار الأمريكي أو الجنيه الإسترليني أو غيرهما من العملات الرئيسة، لمواجهة متطلباتها من هذه العملات مثل: تسديد اعتماد خارجي أو عمل حوالة أجنبية:", options: ["حسابات جارية بالعملة المحلية", "حسابات جارية بالعملة الأجنبية", "حسابات جارية بالدولار", "حسابات جارية باليورو"], correct: [1], multi: 1, explanation: "حسابات جارية بالعملة الأجنبية." },
+      { id: 114, q: "هو عقد بمقتضاه يكفل شخص تنفيذ التزام بأن يتعهد للدائن بأن يفي بهذا الالتزام إذا لم يفي به المدين نفسه، ومتى أوفى الكفيل بالدين جاز له الرجوع على المدين المكفول بما وفاه عنه:", options: ["خطاب الضمان", "خطاب الاعتماد", "الكفالة", "الضمانة"], correct: [2], multi: 1, explanation: "تعريف الكفالة." },
+      { id: 115, q: "من ضوابط فتح الحسابات البنكية للأشخاص الطبيعيين عن بعد:", options: ["عدم السماح بفتح الحساب البنكي عن بعد للعملاء الذين لديهم حسابات بنكية قائمة لدى البنك نفسه", "السماح بفتح الحساب البنكي عن بعد للعملاء الذين لديهم حسابات بنكية قائمة لدى البنك نفسه", "تقدم الخدمة للأفراد المواطنين والخليجيين فقط", "تقدم الخدمة للأفراد المواطنين فقط"], correct: [0], multi: 1, explanation: "عدم السماح بفتح الحساب عن بعد لمن لديه حسابات قائمة لدى البنك نفسه." },
+      { id: 116, q: "أي من الجهات يُستثنى من إغلاق الحساب بعد مرور 90 يوماً دون إيداع:", options: ["الجهات الحكومية", "الجهات الخاصة", "الأفراد", "الهيئات"], correct: [0], multi: 1, explanation: "الجهات الحكومية مستثناة من شرط الإغلاق بعد 90 يوماً." },
+      { id: 117, q: "يُسمح بأن يكون للعميل عدة حسابات لدى البنك، على أن تكون تحت رمز تعريفي واحد لكافة الحسابات، على أنه يُحظر استخدام نفس رقم الحساب لعميل جديد:", options: ["FIC", "IFC", "CFI", "CIF"], correct: [3], multi: 1, explanation: "الرقم الموحد للعميل CIF (Customer Information File)." },
+      { id: 118, q: "على البنوك فتح الحسابات البنكية للأشخاص الطبيعيين والاعتباريين التي يستوجب لفتحها موافقات خاصة خلال ..... يومي عمل:", options: ["يوم عمل", "يومي عمل", "ثلاث أيام عمل", "أربعة أيام عمل"], correct: [1], multi: 1, explanation: "خلال يومي عمل." },
+      { id: 119, q: "يُجمّد الحساب المفتوح بهوية وطنية بعد انقضاء .... يوماً من تاريخ نهاية صلاحيتها:", options: ["60 يوماً", "105 أيام", "120 يوماً", "90 يوماً"], correct: [3], multi: 1, explanation: "90 يوماً من تاريخ انتهاء صلاحية الهوية." },
+      { id: 120, q: "تُعتبر التعاملات راكدة إذا أكملت مدة أربعة وعشرين (24) شهراً ميلادياً بدءاً من تاريخ آخر عملية مدينة أجراها العميل أو وكيله المفوض مسجلة أو مراسلة موثوقة وموثقة:", options: ["الحسابات الراكدة", "الحسابات النشطة", "الحسابات غير المطالب بها", "الحسابات المتروكة"], correct: [0], multi: 1, explanation: "الحسابات الراكدة." },
+      { id: 121, q: "أي مما يلي من أطراف الكمبيالة الثلاثة: (اختر ثلاث إجابات صحيحة)", options: ["الساحب", "المسحوب عليه", "المستفيد", "الساحب عليه", "المستفيد له", "المسحوب له"], correct: [0, 1, 2], multi: 3, explanation: "أطراف الكمبيالة الثلاثة: الساحب، المسحوب عليه، والمستفيد." },
+      { id: 122, q: "يوقع المستفيد الأول على ظهر الشيك دون أن يدون اسم المظهر إليه، ويُسمى هذا التظهير عندئذ:", options: ["التظهير على بياض", "التظهير الخاص", "التظهير المقيد", "التظهير التوكيلي"], correct: [0], multi: 1, explanation: "التظهير على بياض." },
+      { id: 123, q: "\"عقد الدفع الآجل لتملك المستفيد للسكن\":", options: ["عقد التمويل التأجيري", "عقد التمويل الشخصي", "عقد التمويل السكني", "عقد التمويل العقاري"], correct: [3], multi: 1, explanation: "عقد التمويل العقاري." },
+      { id: 124, q: "قرر البنك المركزي السعودي زيادة الحد الأقصى لنسبة التمويل لترتفع من (...)% إلى (...)% من قيمة المسكن الأول للمواطنين فقط:", options: ["85، 90", "75، 80", "60، 70", "80، 85"], correct: [0], multi: 1, explanation: "ارتفعت من 85% إلى 90% للمسكن الأول للمواطنين." },
+      { id: 125, q: "هي بطاقة مشابهة لبطاقة الائتمان إلا أنها تُلزم حاملها بسداد كامل المبلغ المستحق عند استلامه كشف الحساب أو في تاريخ الاستحقاق المحدد في كشف الحساب:", options: ["بطاقة أعمال", "بطاقة الحسم الشهري", "بطاقة الشركات", "بطاقة الائتمان"], correct: [1], multi: 1, explanation: "بطاقة الحسم الشهري (Charge Card)." },
+      { id: 126, q: "يحق لحامل البطاقة إنهاء اتفاقية بطاقة الائتمان أو الحسم الشهري إذا لم يوافق على التعديلات أو التغييرات وذلك بإخطار الجهة المصدرة برغبته في إنهاء الاتفاقية خلال (.......) يوماً من استلامه لإشعار التغيير بواسطة وسيلة اتصال مضمونة مع مراعاة تسوية جميع الأرصدة القائمة في حساب البطاقة:", options: ["7", "14", "21", "28"], correct: [1], multi: 1, explanation: "خلال 14 يوماً من استلام إشعار التغيير." },
+      { id: 127, q: "ينبغي ألا تتجاوز رسوم السداد المتأخر مبلغ (..........) ريال سعودي، على ألا تتجاوز الرسوم المبلغ القائم المستحق:", options: ["50", "100", "150", "200"], correct: [1], multi: 1, explanation: "الحد الأقصى لرسوم السداد المتأخر 100 ريال سعودي." },
+      { id: 128, q: "ينبغي ألا تتجاوز رسوم السحب النقدي: (اختر إجابتين صحيحتين)", options: ["75 ريالاً سعودياً لكل عملية سحب نقدي بمبلغ (5000) ريال سعودي وأقل", "100 ريال سعودي لكل عملية سحب نقدي بمبلغ (5000) ريال سعودي وأقل", "150 ريالاً سعودياً لكل عملية سحب نقدي بمبلغ (5000) ريال سعودي وأقل", "2% من مبلغ العملية لكل عملية تتجاوز (5000) ريال سعودي، وبحد أقصى (200) ريال سعودي", "3% من مبلغ العملية لكل عملية تتجاوز (5000) ريال سعودي، وبحد أقصى (300) ريال سعودي"], correct: [0, 4], multi: 2, explanation: "75 ريالاً لـ 5000 وأقل، و3% بحد أقصى 300 ريال لما يتجاوز 5000 ريال." },
+      { id: 129, q: "التمويل المسؤول يشجع العميل:", options: ["الحصول على التمويل للترفيه", "التحول إلى قروض الأصول بدلاً من القروض الاستهلاكية", "التركيز على القروض الاستهلاكية", "الابتعاد عن القروض"], correct: [1], multi: 1, explanation: "التحول نحو قروض الأصول المنتجة بدلاً من القروض الاستهلاكية." },
+      { id: 130, q: "طبّقت ساما مبادئ التمويل المسؤول للأفراد في شهر رمضان من العام 1439هـ وتُطبق على جميع الممولين وتخضع لها أنشطة التمويل الموجهة إلى عملاء: (اختر ثلاث إجابات صحيحة)", options: ["التمويل الشخصي", "التمويل المضاعف", "التمويل المشترك", "تمويل المركبات والبطاقات الائتمانية", "التمويل العقاري", "التمويل الادخاري"], correct: [0, 3, 4], multi: 3, explanation: "التمويل الشخصي، تمويل المركبات والبطاقات الائتمانية، والتمويل العقاري." },
+      { id: 131, q: "عند احتساب إجمالي دخل العميل الشهري، يجب على البنك مراعاة: (اختر إجابتين صحيحتين)", options: ["احتساب الإعانات الحكومية", "احتساب نصف متوسط الدخول الأخرى مثل عوائد الاستثمار وربع الإيجارات", "التأكد من الدخول الأخرى من خلال كشف حساب لمدة سنتين على الأقل", "احتساب الدخول الأخرى مثل عوائد الاستثمار وربع الإيجارات", "إضافة مزايا حافز وحساب مواطن"], correct: [1, 2], multi: 2, explanation: "احتساب نصف متوسط الدخول الأخرى والتأكد منها بكشف حساب لسنتين على الأقل." },
+      { id: 132, q: "العملاء ذوو الدخل أكبر من (15,000 ريال) وأقل من (25,000 ريال) يجب ألا تتجاوز الالتزامات الائتمانية المترتبة على التمويل والمرتبطة فقط بالاستقطاع الشهري ما نسبته: (اختر إجابتين صحيحتين)", options: ["نسبة 33.33% من إجمالي راتب الموظف", "نسبة 33.33% من إجمالي راتب الموظف و20% من راتب المتقاعد", "نسبة 33.33% من إجمالي راتب الموظف وراتب المتقاعد", "نسبة 25% من راتب المتقاعد", "ثلث الراتب أو الراتب التقاعدي"], correct: [2, 4], multi: 2, explanation: "33.33% (ثلث الراتب) بحسب صيغة السؤال المعتمدة في بنك الأسئلة." },
+      { id: 133, q: "ضمن إجراءات التحصيل من حسابات العملاء، يُحظر على البنوك والمصارف كجهة تمويل القيام بالآتي:", options: ["استقطاع أي مبالغ من حسابات العميل إذا وجد حكم أو قرار قضائي", "الحجز على حسابات أو أرصدة العملاء بشكل دائم دون وجود حكم أو قرار قضائي، إلا أنه يجوز إن كان الحجز مؤقتاً", "استقطاع أو حجز القسط الشهري في تاريخ الاستحقاق المتفق عليه", "حجز أو خصم مستحقات نهاية الخدمة للعملاء المواطنين فقط ما لم يكن هناك حكم أو قرار قضائي"], correct: [3], multi: 1, explanation: "يُحظر حجز أو خصم مستحقات نهاية الخدمة للعملاء المواطنين دون حكم قضائي." },
+      { id: 134, q: "لحوكمة عمليات النوافذ الإسلامية، يجب أن يُعد المصرف قوائم مالية مستقلة لعملياته المصرفية الإسلامية علاوة على القوائم المالية الدورية للمصرف، كل:", options: ["شهر", "ثلاثة أشهر", "ستة أشهر", "سنة"], correct: [1], multi: 1, explanation: "كل ثلاثة أشهر (ربع سنوي)." },
+      { id: 135, q: "ضمن عقد المشاركة بين المصرف الإسلامي والعميل للمساهمة في رأس المال بنسب متساوية أو متفاوتة للتمويل في مشروع ما، بحيث يشتري العميل حصة المصرف بشكل متزايد، يُسمى هذا النوع من المشاركة:", options: ["المشاركة المستمرة", "المشاركة المتناقصة", "المشاركة المنتهية بالتمليك", "ب + ج معاً"], correct: [3], multi: 1, explanation: "تُسمى المشاركة المتناقصة أو المنتهية بالتمليك." },
+      { id: 136, q: "في عقد المضاربة يتفق رب المال مع صاحب العمل على:", options: ["أن يقرض رب المال المضارب مالاً", "الربح يُقسم بينهما بنسبة معلومة بنسبة المساهمة في رأس المال", "إذا حدثت خسارة فيتحملها رب المال وحده", "يضمن المضارب رأس المال لرب المال"], correct: [2], multi: 1, explanation: "الخسارة المالية يتحملها رب المال وحده (ما لم يتعدّ المضارب أو يقصّر) ويخسر المضارب جهده." },
+      { id: 137, q: "أحد عقود الإجارة التي تقدم للمستأجر خياراً بامتلاك الأصل عند نهاية فترة الإجارة، يُسمى:", options: ["الإجارة التشغيلية", "الإجارة المنتهية بالتمليك", "الإجارة الموصوفة في الذمة", "لا يوجد هذا الخيار ضمن عقود الإجارة"], correct: [1], multi: 1, explanation: "الإجارة المنتهية بالتمليك." },
+      { id: 138, q: "مفهوم الاستصناع: (اختر إجابتين صحيحتين)", options: ["لا يجوز بعقد الاستصناع أن يتم الاتفاق مع العميل على بيع أو شراء أصل لم يتم إنشاؤه بعد", "لا تُستخدم صيغة الاستصناع في المصارف في تمويل العقارات وتمويل المشاريع بل تمويل المصانع", "غالباً ما يصاحبها عقد الإجارة الموصوفة في الذمة", "غالباً ما يصاحبها عقد استصناع موازٍ", "عقد استصناع موازٍ يعني أن يقوم البنك بالدخول مع العميل في عقد استصناع ويدخل مع عميل آخر في عقد استصناع موازٍ لنفس المشروع"], correct: [3, 4], multi: 2, explanation: "يصاحبها غالباً عقد استصناع موازٍ ينفذ به البنك التزامه مع العميل." },
+      { id: 139, q: "أركان عقد الاستصناع، هي: (اختر إجابتين صحيحتين)", options: ["المستصنع: هو المصرف الذي يطلب من الصانع صنع سلعة له وفق عقد بينهما", "الصانع: هو المورد الذي ينفذ طلب العميل", "السلعة المصنوعة: هو الشيء الذي يُتفق على صنعه كل من الصانع والمستصنع، ويُقدر بثمن معلوم", "الثمن: هو قيمة السلعة المصنوعة المتفق عليه بين الصانع والمستصنع", "الصيغة: هي صيغة الإيجاب والقبول من قبل المصرف المستصنع والعميل (الصانع) على الشيء المصنوع"], correct: [2, 3], multi: 2, explanation: "السلعة المصنوعة والثمن (لأن العميل هو المستصنع والمصرف هو الصانع)." },
+      { id: 140, q: "من ضمن المهارات السلوكية: (اختر إجابتين صحيحتين)", options: ["اللباقة في التعامل وتحقيق الاحتياجات", "التحلي بالصبر وضبط النفس", "إتقان فنيات العمل", "المعرفة الجيدة بطريقة احتساب النسب", "معرفة شروط تقديم المنتجات والخدمات"], correct: [0, 1], multi: 2, explanation: "اللباقة والتحلي بالصبر وضبط النفس من المهارات السلوكية." },
+      { id: 141, q: "تطبيق القاعدة الذهبية في فن التعامل مع العملاء \"أن العميل دائماً على حق\" تُعتبر من مبادئ المحافظة على العملاء، وتكون ضمن:", options: ["الاهتمام بالعملاء", "إقناع العميل ومعالجة الاعتراضات لديه", "علاج أخطاء الخدمة", "تلبية رغبات العملاء وفقاً لاحتياجاتهم"], correct: [1], multi: 1, explanation: "تندرج ضمن إقناع العميل ومعالجة الاعتراضات لديه." },
+      { id: 142, q: "تتحدد أسس خدمة العملاء في ثلاثة عناصر تشكل أساس الخدمة المتميزة، ومن ضمن هذه العناصر (تدريب الموظفين)، وهو ما يندرج ضمن:", options: ["نوع الخدمة ذاتها", "طبيعة طالب الخدمة", "طبيعة مقدم الخدمة", "ب + ج معاً"], correct: [2], multi: 1, explanation: "تدريب الموظفين يندرج ضمن طبيعة مقدم الخدمة." },
+      { id: 143, q: "تُستخدم الأسئلة المغلقة، بهدف:", options: ["التعرف على احتياجات العميل", "تأكيد ما تم التوصل إليه مع العميل", "جمع المعلومات من العميل", "تحديد أوجه القصور ورأي العميل في كيفية المعالجة للتحسين"], correct: [1], multi: 1, explanation: "الأسئلة المغلقة تهدف لتأكيد ما تم التوصل إليه مع العميل." },
+      { id: 144, q: "ينبغي على المصرف أن يقوم بتوفير الآتي خلال مدة 30 يوم عمل، وهي: (اختر إجابتين صحيحتين)", options: ["إصدار خطاب إخلاء الطرف ومنحه للعميل خلال هذه المدة من تاريخ طلبه", "إصدار خطاب إخلاء الطرف ومنحه للعميل خلال هذه المدة من تاريخ طلبه، في حال وجود بطاقة ائتمان", "إبلاغ العملاء بأي تغييرات في الأحكام والشروط خلال هذه المدة", "إحاطة العميل باستلام طلب تحويل الحساب وإكمال الطلب", "يوفر المصرف خلال هذه المدة أو حسب الاتفاق مع العميل المستندات في حال طلب العميل لها"], correct: [1, 2], multi: 2, explanation: "إصدار إخلاء الطرف في حال وجود بطاقة ائتمان، وإبلاغ العملاء بتغييرات الأحكام والشروط." },
+      { id: 145, q: "ينبغي على المصرف أن يقوم بتوفير الآتي خلال مدة 60 يوم عمل، وهي:", options: ["يوفر المصرف خلال هذه المدة أو حسب الاتفاق مع العميل المستندات في حال طلب العميل لها", "إبلاغ العملاء بأي تغييرات في الأحكام والشروط خلال هذه المدة", "إبلاغ العميل بأي قرار يتخذه المصرف في حال إغلاق حساب العميل خلال هذه المدة من تاريخ صدور القرار", "إصدار خطاب إخلاء الطرف ومنحه للعميل خلال هذه المدة من تاريخ طلبه"], correct: [2], multi: 1, explanation: "الإجابة المعتمدة في بنك الأسئلة لهذا السؤال هي الخيار الثالث." },
+      { id: 146, q: "ينبغي على المصرف أن يقوم بتوفير الآتي خلال مدة 7 أيام عمل، وهي:", options: ["إحاطة العميل باستلام طلب تحويل الحساب وإكمال الطلب", "إصدار خطاب إخلاء الطرف ومنحه للعميل خلال هذه المدة من تاريخ طلبه، في حال وجود بطاقة ائتمان", "إبلاغ العميل بأي قرار يتخذه المصرف في حال إغلاق حساب العميل خلال هذه المدة من تاريخ صدور القرار", "إبلاغ العملاء بأي تغييرات في الأحكام والشروط خلال هذه المدة"], correct: [0], multi: 1, explanation: "إحاطة العميل باستلام طلب تحويل الحساب وإكمال الطلب خلال 7 أيام عمل." },
+      { id: 147, q: "ينبغي على المصرف أن يقوم بتوفير الآتي خلال مدة 2 يوم عمل، وهي:", options: ["المدة الزمنية المتوقعة لتواصل المصرف مع الشاكي وإحاطته بشأنها من تاريخ استلامها", "إبلاغ العملاء في حال لم يتمكن من إرسال أي حوالة خارجية بسبب إعادتها من البنك المراسل", "إصدار خطاب إخلاء الطرف ومنحه للعميل خلال هذه المدة من تاريخ طلبه", "إبلاغ العملاء بأي تغييرات في الأحكام والشروط خلال هذه المدة"], correct: [1], multi: 1, explanation: "إبلاغ العملاء المتأثرين بإعادة الحوالة الخارجية خلال يومي عمل." },
+      { id: 148, q: "ينبغي للمصرف التأكد من عدم الإشارة إلى أن المنتج أو الخدمة مجانية، إلا في حال:", options: ["كون المنتج أو الخدمة تُمنح جزئياً مجاناً لجميع العملاء", "كون المنتج أو الخدمة تُمنح كاملاً مجاناً لجميع العملاء", "كون المنتج أو الخدمة تُمنح جزئياً مجاناً لفئات العملاء المتميزين", "كون المنتج أو الخدمة تُمنح كاملاً مجاناً لفئات العملاء المتميزين"], correct: [1], multi: 1, explanation: "يجب أن يكون المنتج مجانياً بالكامل ولجميع العملاء حتى يوصف بالمجاني." },
+      { id: 149, q: "ضمن الالتزامات الرئيسية في مجال الشكاوى، ينبغي على المصرف الآتي: (اختر إجابتين صحيحتين)", options: ["التواصل مع الشاكي وإحاطته بالشأن خلال أسبوع من تاريخ استلامها", "التواصل مع الشاكي وإحاطته بالشأن خلال 3 أيام عمل من تاريخ استلامها", "في حال عدم إنهاء الشكوى خلال هذه المدة، فعليه إحاطته في موعد أقصاه 10 أيام عمل بآخر مستجداتها", "في حال عدم إنهاء الشكوى خلال هذه المدة، فعليه إحاطته في موعد أقصاه 7 أيام عمل بآخر مستجداتها", "لا ينبغي إعطاء اسم المسؤول عن متابعة الشكوى أو رقم هاتفه للعميل"], correct: [0, 2], multi: 2, explanation: "التواصل خلال أسبوع، وتحديث المستجدات في موعد أقصاه 10 أيام عمل." },
+      { id: 150, q: "يحتاج تطبيق الالتزام إلى تنظيم وترتيب، وهذا بسبب: (اختر إجابتين صحيحتين)", options: ["عدم تعقد المتطلبات الصادرة من السلطات التنظيمية", "عدم تنوع المتطلبات الصادرة من السلطات التنظيمية", "العدد الكبير والمتزايد في الأنظمة والمتطلبات الصادرة من السلطات التنظيمية", "العدد المحدود للأنظمة والمتطلبات الصادرة من السلطات التنظيمية", "تنوع وتعقد المتطلبات الصادرة من السلطات التنظيمية"], correct: [2, 4], multi: 2, explanation: "العدد الكبير والمتزايد وتنوع وتعقد المتطلبات التنظيمية." },
+      { id: 151, q: "وظيفة الالتزام هي وظيفة مستقلة تحدد وتقيم وتقدم النصح والمشورة، وتراقب وتعد التقارير حول المخاطر التالية:", options: ["المخاطر التشغيلية في البنك", "مخاطر الالتزام في البنك", "مخاطر عدم الالتزام في البنك", "مخاطر الالتزام وعدم الالتزام في البنك"], correct: [2], multi: 1, explanation: "مخاطر عدم الالتزام في البنك." },
+      { id: 152, q: "يجب على جميع البنوك الالتزام الكامل والتقيد بتطبيق كافة التعليمات والأدلة والأنظمة الصادرة عن الجهات النظامية والرقابية واجبة التطبيق أثناء أدائها لأعمالها، ومن ضمنها تطبيق (مبادئ حماية العملاء) مما يحقق:", options: ["فوائد لحوكمة الشركات", "فوائد مالية للبنك", "فوائد للعميل", "فوائد على صعيد سمعة البنك"], correct: [3], multi: 1, explanation: "يحقق فوائد على صعيد سمعة البنك وثقة العملاء." },
+      { id: 153, q: "التعريف التالي: (المخاطر التي تنجم عنها عقوبات وإجراءات نظامية، أو خسائر مالية أو إساءة لسمعة البنك نتيجة لإخفاقه في تطبيق الأنظمة والتعليمات والقواعد والتعاميم والقيم السلوكية والأخلاقية التي يعمل البنك من خلالها)، هو تعريف:", options: ["مخاطر الالتزام", "مخاطر عدم الالتزام", "المخاطر التشغيلية", "مخاطر العمليات"], correct: [1], multi: 1, explanation: "مخاطر عدم الالتزام." },
+      { id: 154, q: "يكون لإدارة الالتزام وضع رسمي داخل البنك يمنحها المكانة المناسبة والاستقلالية ومرجعيتها إلى:", options: ["الرئيس التنفيذي", "مجلس الإدارة", "إدارة المراجعة الداخلية", "الإدارة القانونية"], correct: [1], multi: 1, explanation: "مرجعية إدارة الالتزام إلى مجلس الإدارة لضمان استقلاليتها." },
+      { id: 155, q: "المبادئ الرئيسية للحوكمة تشمل (الكفاءة)، وينبغي أن تتضمن التعليم والتدريب والمهارات والرغبة في مواصلة التعلم، وتوافر خبرة متنوعة في مجالات متعددة مرتبطة بالإدارة والاقتصاد والمحاسبة والبنوك لا تقل عن:", options: ["ثلاث سنوات", "خمس سنوات", "عشر سنوات", "15 سنة"], correct: [1], multi: 1, explanation: "خبرة لا تقل عن خمس سنوات." },
+      { id: 156, q: "من صور الجرائم المالية، الآتي: (اختر إجابتين صحيحتين)", options: ["غسل الأموال", "السلب أو السطو المسلح", "تزوير المستندات", "إحداث جروح بدنية جسيمة", "الابتزاز"], correct: [0, 2], multi: 2, explanation: "غسل الأموال وتزوير المستندات من الجرائم المالية." },
+      { id: 157, q: "يمكن أن يرتكب الاحتيال المالي أشخاص من غير موظفي البنك، وهذا يُسمى:", options: ["الداخلي", "الخارجي", "المشترك", "الإلكتروني"], correct: [1], multi: 1, explanation: "الاحتيال الخارجي." },
+      { id: 158, q: "لقد أفادت استطلاعات عديدة أجريت خلال السنوات الأخيرة أن التهديد الرئيسي للاحتيال الذي يواجه المؤسسات المالية، إنما يأتي في الغالب عن طريق المطلعين، ويُقصد بهم:", options: ["الموظفين أو المديرين فهم يتمتعون بصلاحية الدخول ومعرفة الأنظمة", "المديرين فقط من أصحاب الصلاحيات الكبيرة", "الموظفين فقط المخولين بالاطلاع على حسابات وتعاملات العملاء", "مخترقي الأنظمة الإلكترونية"], correct: [0], multi: 1, explanation: "الموظفون والمديرون من داخل المؤسسة الذين يملكون صلاحيات ومعرفة بالأنظمة." },
+      { id: 159, q: "يمكن تقسيم الأعمال الاحتيالية وفقاً للعديد من الأسس على النحو الآتي: (اختر إجابتين صحيحتين)", options: ["الاحتيال الدولي", "الاحتيال المادي", "الاحتيال المعنوي", "الاحتيال الإلكتروني", "الاحتيال المحلي"], correct: [1, 3], multi: 2, explanation: "الاحتيال المادي والاحتيال الإلكتروني." },
+      { id: 160, q: "احتيال بطاقة الائتمان، يمكن تصنيفه من ضمن:", options: ["الاحتيال الإلكتروني", "الاحتيال المادي (التقليدي)", "الاحتيال المعنوي", "الاحتيال المحلي"], correct: [1], multi: 1, explanation: "يُصنف ضمن الاحتيال المادي (التقليدي) وفق المنهج المعتمد." },
+      { id: 161, q: "من ضمن الإجراءات الوقائية المتخذة في تحويل الأرصدة تحويلاً برقياً (إلكترونياً)، الآتي:", options: ["مراجعة جميع معاملات التحويل الإلكتروني في نهاية كل شهر للتأكد من تنفيذ تعليمات التحويل بشكل صحيح", "مراجعة جميع معاملات التحويل الإلكتروني كل 10 أيام للتأكد من تنفيذ تعليمات التحويل بشكل صحيح", "مراجعة جميع معاملات التحويل الإلكتروني في نهاية كل أسبوع للتأكد من تنفيذ تعليمات التحويل بشكل صحيح", "مراجعة جميع معاملات التحويل الإلكتروني في نهاية كل يوم للتأكد من تنفيذ تعليمات التحويل بشكل صحيح"], correct: [3], multi: 1, explanation: "المراجعة اليومية في نهاية كل يوم." },
+      { id: 162, q: "الجهة التي تلعب لدى البنك دوراً رئيسياً في وضع سياسة مكافحة ومراقبة الاحتيال، والتأكد من أن السياسات والإجراءات والتدابير التي تتضمنها الاستراتيجية الشاملة لمراقبة الاحتيال تُطبق بصورة فعالة، هي:", options: ["الإدارة", "لجنة مراقبة الاحتيال", "وحدة التحقيق بشأن الاحتيال", "الموظفين"], correct: [1], multi: 1, explanation: "لجنة مراقبة الاحتيال." },
+      { id: 163, q: "يُعد مرتكب جريمة غسل الأموال كل من قام بأي من الأفعال التالية: (اختر إجابتين صحيحتين)", options: ["تحويل أموال أو نقلها أو إجراء أي عملية باستخدامها مع علمه بأنها ناتجة من نشاط غير مشروع", "نقل أموال خارج الإطار المصرفي", "إخفاء أو تمويه طبيعة الأموال أو مصدرها أو حركتها أو ملكيتها مع علمه بأنها ناتجة من نشاط غير مشروع", "التبرعات لجمعيات خيرية", "الذي يمارس تجارة الأوف شور"], correct: [0, 2], multi: 2, explanation: "تحويل الأموال غير المشروعة أو إخفاء وتمويه مصدرها وملكيتها." },
+      { id: 164, q: "من أهداف عملية غسل الأموال: (اختر إجابتين صحيحتين)", options: ["التهرب الضريبي", "زيادة صعوبة معرفة مصدر الأموال", "الفساد", "الرشوة", "إعادة تدوير الأموال لتبدو أنها متحققة من مصادر مشروعة"], correct: [1, 4], multi: 2, explanation: "زيادة صعوبة تتبع مصدر الأموال وإعادة تدويرها لتبدو مشروعة." },
+      { id: 165, q: "تمر عمليات غسل الأموال عادة بثلاث مراحل، وهي بالترتيب:", options: ["التغطية، الإيداع، الدمج", "الإيداع، الدمج، التغطية", "الإيداع، التغطية، الدمج", "الدمج، الإيداع، التغطية"], correct: [2], multi: 1, explanation: "الترتيب الصحيح: الإيداع -> التغطية -> الدمج." },
+      { id: 166, q: "يُشار إلى التقنيات أو الطرق المختلفة المستخدمة لغسل الأموال أو تمويل الإرهاب عادة بعبارة الأنماط، ومن أمثلة الأنماط المتعلقة بغسل الأموال (التلاعب بالفواتير، واستخدام طرق التمويل التجاري والسلع لتفادي قوانين وأنظمة الشفافية المالية)، وهذا النمط هو:", options: ["تهريب نقل العملات", "خدمات التحويل البديلة", "غسل الأموال عن طريق التجارة", "التنظيم - التركيب أو التجزئة"], correct: [2], multi: 1, explanation: "غسل الأموال عن طريق التجارة." },
+      { id: 167, q: "جريمة غسل الأموال لها العديد من المخاطر السلبية، ومنها الآثار السياسية، والتي تتمثل في:", options: ["إضعاف قدرة السلطات على تنفيذ السياسات الاقتصادية بكفاءة", "اختراق هياكل بعض الحكومات وإفسادها", "خلق تشوهات في توزيع الموارد والثروة داخل الاقتصاد", "زيادة معدلات الجريمة والفساد"], correct: [1], multi: 1, explanation: "اختراق هياكل بعض الحكومات وإفسادها من الآثار السياسية." },
+      { id: 168, q: "ضمن العقوبات على جرائم غسل الأموال، للجهة الرقابية عند اكتشاف أي مخالفة من المؤسسات المالية أو الأعمال والمهن غير المالية المحددة أو المنظمات غير الهادفة إلى الربح، أن تتخذ أو تفرض واحدة أو أكثر من الإجراءات أو الجزاءات الآتية:", options: ["فرض غرامة مالية لا تتجاوز ثلاثة ملايين ريال سعودي عن كل مخالفة", "فرض غرامة مالية لا تتجاوز خمسة ملايين ريال سعودي عن كل مخالفة", "فرض غرامة مالية لا تتجاوز سبعة ملايين ريال سعودي عن كل مخالفة", "فرض غرامة مالية لا تتجاوز عشرة ملايين ريال سعودي عن كل مخالفة"], correct: [1], multi: 1, explanation: "غرامة مالية لا تتجاوز خمسة ملايين ريال سعودي عن كل مخالفة." },
+      { id: 169, q: "ضمن العقوبات على جرائم غسل الأموال، يُعاقب كل من يرتكب جريمة غسل الأموال بالآتي:", options: ["السجن مدة لا تقل عن سنتين ولا تتجاوز عشر سنوات، أو بغرامة لا تزيد على ثلاثة ملايين ريال، أو بكلتا العقوبتين", "السجن مدة لا تقل عن سنتين ولا تتجاوز عشر سنوات، أو بغرامة لا تزيد على خمسة ملايين ريال، أو بكلتا العقوبتين", "السجن مدة لا تزيد عن سنتين، أو بغرامة لا تزيد على خمسة ملايين ريال، أو بكلتا العقوبتين", "السجن مدة لا تزيد عن 5 سنوات، أو بغرامة لا تزيد على خمسة ملايين ريال، أو بكلتا العقوبتين"], correct: [1], multi: 1, explanation: "السجن من سنتين إلى 10 سنوات أو غرامة حتى 5 ملايين ريال أو بكلتيهما." },
+      { id: 170, q: "عادة تمر عمليات تمويل الإرهاب بثلاث مراحل، وهي بالترتيب:", options: ["نقل الأموال، جمع الأموال، استخدام الأموال", "جمع الأموال، نقل الأموال، استخدام الأموال", "استخدام الأموال، جمع الأموال، نقل الأموال", "جمع الأموال، استخدام الأموال، نقل الأموال"], correct: [1], multi: 1, explanation: "جمع الأموال -> نقل الأموال -> استخدام الأموال." },
+      { id: 171, q: "يُقصد بالمؤسسة المالية وفقاً لتعريف نظام مكافحة غسل الأموال بأنها:", options: ["الجهة المسؤولة عن تنظيم الأعمال المالية", "الكيان الذي يلعب دوراً استثمارياً في المملكة العربية السعودية", "أي منشأة داخل أو خارج المملكة العربية السعودية", "أي منشأة في المملكة العربية السعودية تزاول واحداً أو أكثر من الأنشطة المالية"], correct: [3], multi: 1, explanation: "أي منشأة في المملكة تزاول واحداً أو أكثر من الأنشطة المالية المحددة في النظام." },
+      { id: 172, q: "من أنواع المشاركات في المصارف:", options: ["مشاركة الديون البيعية", "المشاركة المتناقصة أو المنتهية بالتمليك", "مشاركة رأس المال", "مشاركة الخسارة فقط"], correct: [1], multi: 1, explanation: "المشاركة المتناقصة أو المنتهية بالتمليك." },
+      { id: 173, q: "من المصادر الخارجية للبنوك الإسلامية للقيام بمهامها: (اختر إجابتين صحيحتين)", options: ["رأس مال البنك", "الودائع الادخارية", "المخصصات", "الحسابات الجارية", "الأرباح المحتجزة"], correct: [1, 3], multi: 2, explanation: "الودائع الادخارية والحسابات الجارية مصادر خارجية من العملاء." },
+      { id: 174, q: "عقد بين طرفين أحدهما المقرض والآخر المقترض، يتم بمقتضاه دفع مال مملوك للمقرض إلى المقترض على أن يقوم هذا الأخير (المقترض) برده أو رد مثله إلى المقرض في الزمان والمكان المتفق عليهما:", options: ["مفهوم التورق", "مفهوم الإجارة", "مفهوم الاستصناع", "مفهوم القرض الحسن"], correct: [3], multi: 1, explanation: "مفهوم القرض الحسن (بدون زيادة أو فائدة)." },
+      { id: 175, q: "تُوضع سياسة المصرف الإسلامي على عدة أسس، منها:", options: ["إغفال عامل التنمية المجتمعية والنهوض المادي للمجتمع", "أن تمكنه صبغته الإسلامية من النجاح بوصفه بنكاً من ممارسة الدور الذي تتطلبه الحياة الاقتصادية والصناعية والتجارية من تنمية المجتمع والنهوض به", "تأسيس المصارف بهدف الربح فقط", "تبادل السلع بناءً على أحكام التعامل في البنوك التجارية"], correct: [1], multi: 1, explanation: "تحقيق التنمية المجتمعية والاقتصادية في إطار الصبغة الإسلامية." },
+      { id: 176, q: "في حال اكتشاف البنك لأي أسلوب أو ظاهرة احتيالية جديدة نتج أو لم ينتج عنها خسارة مالية، أو في حال أي عملية احتيال داخلي، فيجب على البنك إشعار البنك المركزي خلال مدة لا تزيد عن الآتي:", options: ["يوم عمل", "يومي عمل", "ثلاثة أيام عمل", "خمسة أيام عمل"], correct: [3], multi: 1, explanation: "خلال مدة لا تزيد عن خمسة أيام عمل." },
+      { id: 177, q: "يمكن استخدام التحويلات البرقية في عملية غسل الأموال ضمن مرحلة:", options: ["التهريب", "الدمج", "التغطية", "الإحلال"], correct: [2], multi: 1, explanation: "مرحلة التغطية لتحريك الأموال بسرعة وتعقيد تتبعها." },
+      { id: 178, q: "عند اكتشاف جريمة مالية مرتبطة بعمليات غسل أموال وتمويل إرهاب ومرتكبة من قبل المؤسسة المالية، فإنه يحق للجهة الرقابية:", options: ["إصدار أمر يتضمن الالتزام بتعليمات محددة", "منع مرتكب المخالفة من العمل تحت أي جهة حكومية", "سجن رئيس مجلس الإدارة", "إيقاف المدراء عن جميع أعمالهم الشخصية"], correct: [0], multi: 1, explanation: "إصدار أمر يتضمن الالتزام بتعليمات محددة." },
+      { id: 179, q: "عند اختيار البنك لطريقة استثمار أموال المودعين فإنه لا بد من أن يوازن بين ثلاثة عوامل رئيسية عند إقرار سياسته الاستثمارية: (اختر ثلاث إجابات صحيحة)", options: ["الربحية", "المنتجات البنكية", "عدد الفروع العاملة", "السيولة", "الأمان"], correct: [0, 3, 4], multi: 3, explanation: "الموازنة بين الربحية، السيولة، والأمان." },
+      { id: 180, q: "من المهام الأساسية للبنك المركزي السعودي: (اختر إجابتين صحيحتين)", options: ["القيام بأعمال مصرف الحكومة", "مراقبة الشركات العقارية", "مراقبة سوق الأسهم", "مراقبة شركات الوساطة المالية", "مراقبة المصارف التجارية"], correct: [0, 4], multi: 2, explanation: "القيام بأعمال مصرف الحكومة ومراقبة المصارف التجارية." },
+      { id: 181, q: "لعدم وجود إطار قانوني تنظيمي دولي محدد يمكن به تنفيذ المعايير الدولية، يتعين على الدول الموقعة:", options: ["اعتماد المعايير المتفق عليها وإدراجها رسمياً في النظام القانوني الداخلي", "إيجاد معايير غير المتفق عليها وإدراجها رسمياً في النظام القانوني الداخلي", "اعتماد المعايير المتفق عليها دون إدراجها رسمياً في النظام القانوني الداخلي", "إيجاد معايير غير المتفق عليها دون إدراجها رسمياً في النظام القانوني الداخلي"], correct: [0], multi: 1, explanation: "اعتماد المعايير الدولية وإدراجها رسمياً في النظام القانوني الداخلي." },
+      { id: 182, q: "صك محرر وفق شكل معين حدده النظام يتضمن تعهداً من محرره بدفع مبلغ معين من النقود لصالح المستفيد:", options: ["السند لأمر", "الكمبيالة", "الضمان البنكي", "الشيك"], correct: [0], multi: 1, explanation: "السند لأمر يتضمن تعهداً من محرره بالدفع." },
+      { id: 183, q: "أي من المنتجات التالية توفر مردوداً ربحياً ثابتاً للعميل لفترة معينة يحددها بنفسه؟", options: ["حساب جاري", "حساب استثماري", "حساب بطاقة الائتمان", "وديعة لأجل"], correct: [3], multi: 1, explanation: "الوديعة لأجل." },
+      { id: 184, q: "تختلف الودائع عن الودائع الثابتة في أن:", options: ["يحق للعميل في الودائع بإخطار سحب الأموال المودعة", "نسبة الودائع بإخطار أعلى من نسبة الودائع الثابتة", "لا يُشترط في الودائع بإخطار إشعار البنك قبل سحب الوديعة", "لا يحق للعميل في الودائع بإخطار سحب الأموال المودعة"], correct: [0], multi: 1, explanation: "يحق للعميل في الودائع بإخطار سحب أمواله بعد إشعار البنك بالمدة المتفق عليها." },
+      { id: 185, q: "الرسوم الواردة في التعرفة البنكية الصادرة من قبل البنك المركزي السعودي تمثل:", options: ["الحد الأدنى المسموح به", "الحد الأقصى الذي يتقاضاه البنك", "الرسوم الأقل بين دول العالم", "متوسط الرسوم بين البنوك"], correct: [1], multi: 1, explanation: "تمثل الحد الأقصى للرسوم التي يجوز للبنك تقاضيها." },
+      { id: 186, q: "أصدر البنك المركزي السعودي التعرفة البنكية لرسوم الخدمات والمنتجات المقدمة للعملاء ولا يمكن للبنوك فرضها إلا بـ:", options: ["إشعار العميل بذلك كتابياً", "الحصول على موافقة وقبول العميل", "التواصل مع العميل بريدياً", "إرسال رسالة نصية للعميل"], correct: [1], multi: 1, explanation: "لا يجوز فرض الرسوم إلا بعد الحصول على موافقة وقبول العميل." },
+      { id: 187, q: "إصدار وثائق أو شهادات مالية متساوية القيمة، تمثل حصصاً شائعة في ملكية موجودات قائمة فعلاً، أو سيتم إنشاؤها من حصيلة الاكتتاب، وتُصدر وفق عقد شرعي وتأخذ أحكامه:", options: ["الأسهم الممتازة", "التوريق التقليدي", "السندات", "التوريق الإسلامي"], correct: [3], multi: 1, explanation: "التوريق الإسلامي." },
+      { id: 188, q: "اتفاق مع عميل على بيع أو شراء أصل ربما لم يتم إنشاؤه بعد، على أن يتم بناؤه وفقاً لمواصفات المشتري في تاريخ مستقبلي محدد بسعر بيع محدد سلفاً:", options: ["مفهوم السلم", "مفهوم الاستصناع", "مفهوم البيوع", "مفهوم الإجارة"], correct: [1], multi: 1, explanation: "مفهوم الاستصناع." },
+      { id: 189, q: "يميز المصرفية الإسلامية ما يلي:", options: ["التعامل بالفائدة", "المشاركة في الربح فقط", "المشاركة في الخسارة فقط", "عدم التعامل بالربا"], correct: [3], multi: 1, explanation: "عدم التعامل بالربا." },
+      { id: 190, q: "شراء السلع وبيعها للعملاء يمثل أحد أشكال عقود المعاملات التي تقوم بها البنوك الإسلامية على أساس البيع الآجل الذي يتفق عليها البنك مع العميل طالب الشراء، وأهم أشكال هذه البيوع:", options: ["بيع المرابحة", "بيع السلم", "بيع الغرر", "بيع المشاركة"], correct: [0], multi: 1, explanation: "بيع المرابحة." },
+      { id: 191, q: "تتميز المصارف الإسلامية عن المصارف التقليدية بـ:", options: ["لا يوجد فرق في كيفية تمويل المشروعات", "جمع الأموال وتمويل المشروعات المبني على المرابحة", "منع تمويل المشروعات", "جمع الأموال وتمويل المشروعات المبني على فوائد"], correct: [1], multi: 1, explanation: "جمع الأموال وتمويل المشروعات المبني على المرابحة وصيغ التمويل الشرعية." },
+      { id: 192, q: "تتميز المصارف الإسلامية عن المصارف التقليدية بأن مواردها من:", options: ["الاستثمار بفوائد معلومة وبدون خسارة", "أرباح الودائع المستثمرة شرعياً", "حقوق الملكية", "الودائع بغرض الاستثمار عن طريق الإقراض"], correct: [1], multi: 1, explanation: "أرباح الودائع المستثمرة شرعياً." },
+      { id: 193, q: "يُطلق على ما يقدمه البنك كضمان أو تأمين لوفاء بعض العملاء بمديونيتهم، وتأكيداً لجديتهم في التزاماتهم المبرمة معهم بـ:", options: ["وديعة استثمارية", "حوالة خارجية", "بطاقة ائتمان", "الأوراق التجارية"], correct: [3], multi: 1, explanation: "الإجابة المؤشرة في هذا النموذج من التجميعات هي: الأوراق التجارية." },
+      { id: 194, q: "تُعرف بالأوراق التجارية: (اختر إجابتين صحيحتين)", options: ["الحوالة الخارجية", "الشيك", "قسيمة الإيداع", "خطاب الضمان", "السند لأمر"], correct: [1, 4], multi: 2, explanation: "الشيك والسند لأمر (إضافة للكمبيالة)." },
+      { id: 195, q: "تُطبق مبادئ التمويل المسؤول على:", options: ["جميع أنشطة التمويل الموجهة للعملاء التي تتضمن كل المنتجات والبرامج الائتمانية الموجهة للأفراد", "موظفي خدمة العملاء في قطاع تمويل السيارات", "عملاء قطاع التمويل العقاري", "مدراء الالتزام في قطاع التمويل"], correct: [0], multi: 1, explanation: "تطبق على جميع أنشطة ومنتجات التمويل الموجهة للأفراد." },
+      { id: 196, q: "إذا كان دخل العميل أقل من 15,000 ريال، يجب ألا تتجاوز الالتزامات الائتمانية الشهرية خلاف الالتزامات الائتمانية العقاري ما نسبته:", options: ["25%", "45%", "33%", "60%"], correct: [1], multi: 1, explanation: "45% من إجمالي الدخل الشهري." },
+      { id: 197, q: "تُطبق مبادئ التمويل المسؤول على المنتجات التالية: (اختر ثلاث إجابات صحيحة)", options: ["التمويل العقاري", "تمويل المركبات", "التمويل الشخصي", "تمويل المنشآت الصغيرة والمتوسطة", "سلفة الراتب المقدمة من جهة العمل"], correct: [0, 1, 2], multi: 3, explanation: "التمويل العقاري، تمويل المركبات، والتمويل الشخصي." },
+      { id: 198, q: "يكون الالتزام الائتماني الشهري للبطاقة الائتمانية مساوياً لـ:", options: ["الحد الأعلى للسداد من السقف الائتماني لكل بطاقة ائتمان مصدرة للعميل", "للسقف الائتماني لكل بطاقة ائتمان مصدرة للعميل", "يجب سداد كامل المديونية قبل التقدم بطلب تمويل جديد", "الحد الأدنى للسداد من السقف الائتماني لكل بطاقة ائتمان مصدرة للعميل"], correct: [3], multi: 1, explanation: "يُحتسب عند مستوى الحد الأدنى للسداد من السقف الائتماني لكل بطاقة." },
+      { id: 199, q: "يجب على الموظف معرفة معلومات البنوك المنافسة من حيث:", options: ["التنوع الجغرافي لهم", "التسلسل الوظيفي فيها", "القطاعات التي يخدمونها", "عدد العملاء"], correct: [2], multi: 1, explanation: "القطاعات التي يخدمونها ومنتجاتهم." },
+      { id: 200, q: "في حال عدم رضا العميل عن نتيجة شكواه ورغبته في التصعيد:", options: ["يجب على البنك تزويد العميل بالآلية المتبعة", "يجوز للبنك تجاهل الشكوى", "يحق للبنك إغلاق الشكوى مباشرة", "يجوز للبنك تزويد العميل بالآلية المتبعة للتأجيل"], correct: [0], multi: 1, explanation: "يجب على البنك تزويد العميل بآلية التصعيد المتبعة." },
+      { id: 201, q: "ينبغي توفير الأحكام والشروط المحدثة للعميل من خلال:", options: ["المخاطبات الرسمية", "القناة التي يفضلها العميل", "رسائل الجوال", "البريد الإلكتروني الرسمي للمصرف"], correct: [1], multi: 1, explanation: "عبر القناة التي يفضلها العميل." },
+      { id: 202, q: "وضع ضوابط لحالات السماح بالهدايا العينية البسيطة للموظفين التي تقل قيمتها عن حد معين (تقدره إدارة الالتزام)، فيجب:", options: ["طلب قيمة الهدية نقداً", "قبول الهدية مباشرة", "تحويلها لأحد الأقارب", "إبلاغ إدارة الالتزام"], correct: [3], multi: 1, explanation: "إبلاغ إدارة الالتزام." },
+      { id: 203, q: "من مهام البنك المركزي السعودي:", options: ["استلام ودائع العملاء في الحسابات الجارية وحسابات الودائع لأجل", "وضع وإدارة السياسة النقدية، وتنظيم سوق صرف العملات الأجنبية", "شراء وبيع العملات الأجنبية للجمهور", "تقديم القروض اللازمة لتمويل المشروعات"], correct: [1], multi: 1, explanation: "وضع وإدارة السياسة النقدية وتنظيم سوق الصرف." },
+      { id: 204, q: "البنوك التي تنشئها الدولة لتتولى عملية الإشراف والتوجيه والرقابة على الجهاز المصرفي، ولها حق إصدار العملة والاحتفاظ بالأصول السائلة الخاصة بالدولة، كالذهب والعملات الأجنبية هي:", options: ["البنوك العقارية", "البنوك التجارية", "البنوك الصناعية", "البنوك المركزية"], correct: [3], multi: 1, explanation: "البنوك المركزية." },
+      { id: 205, q: "أي من الأعمال التالية يُحظر على البنك المركزي السعودي مزاولتها:", options: ["الرقابة والإشراف على المؤسسات المالية وفقاً للأنظمة ذات العلاقة", "اتخاذ الإجراءات والتدابير المناسبة للحد من ارتكاب الجرائم المرتبطة بالمؤسسات المالية", "تمويل الحكومة وإقراضها", "إدارة واستثمار احتياطيات النقد الأجنبي"], correct: [2], multi: 1, explanation: "يُحظر على البنك المركزي السعودي تمويل الحكومة وإقراضها." },
+      { id: 206, q: "البنوك التي تُصدر الأوراق المالية الخاصة بالشركات والسندات الحكومية، لكي تضمن الشركات تغطية الأسهم والسندات المعروضة على الجمهور في فترة عرضها للاكتتاب العام:", options: ["بنوك الأعمال", "البنوك المركزية", "البنوك العقارية", "البنوك الزراعية"], correct: [0], multi: 1, explanation: "بنوك الأعمال (الاستثمار)." },
+      { id: 207, q: "أي من الأعمال الآتية يلزم على أي بنك الحصول على ترخيص كتابي من البنك المركزي قبل قيامه بها:", options: ["فتح الاعتمادات المستندية", "تعديل تكوين رأس مال البنك المدفوع أو المستثمر", "إصدار بطاقات الائتمان وبطاقات الصراف الآلي", "التعامل في الأسهم والصرف الأجنبي"], correct: [1], multi: 1, explanation: "تعديل تكوين رأس مال البنك يتطلب ترخيصاً كتابياً مسبقاً." },
+      { id: 208, q: "وفقاً لنظام مراقبة البنوك، لا يجوز أن تزيد التزامات البنك من الودائع على:", options: ["ضعف مجموع احتياطياته ورأس ماله المدفوع أو المستثمر", "خمسة أمثال مجموع احتياطياته ورأس ماله المدفوع أو المستثمر", "عشرة أمثال مجموع احتياطياته ورأس ماله المدفوع أو المستثمر", "خمسة عشر مثلاً من مجموع احتياطياته ورأس ماله المدفوع أو المستثمر"], correct: [3], multi: 1, explanation: "15 مثلاً من مجموع الاحتياطيات ورأس المال المدفوع." },
+      { id: 209, q: "أي من الأعمال الآتية يُحظر على البنوك العاملة في المملكة العربية السعودية مزاولتها:", options: ["الاشتغال بتجارة الجملة أو التجزئة أو الاستيراد أو التصدير", "فتح الحسابات الجارية والادخار", "الوساطة المالية بين المقرضين والمقترضين", "المساهمة في تمويل التجارة الخارجية"], correct: [0], multi: 1, explanation: "يُحظر على البنوك الاشتغال بالتجارة (الجملة أو التجزئة أو الاستيراد والتصدير)." },
+      { id: 210, q: "البنوك التي تزاول الأعمال المصرفية بشكل أساسي عن طريق شبكة الإنترنت وتطبيقات الجوال، تُسمى:", options: ["البنوك العقارية", "البنوك المركزية", "البنوك الرقمية", "البنوك الزراعية"], correct: [2], multi: 1, explanation: "البنوك الرقمية." },
+      { id: 211, q: "الكفالة التي تصدر للدخول في المناقصات وتنتهي باستحقاقها أو عند إحالة المناقصة أيهما أسبق، تُسمى:", options: ["خطاب الضمان الابتدائي", "خطاب الضمان النهائي", "خطاب ضمان الدفعة المقدمة", "الاعتماد المستندي"], correct: [0], multi: 1, explanation: "خطاب الضمان الابتدائي." },
+      { id: 212, q: "الودائع التي تخوّل للعميل إمكانية سحبها عند الحاجة إليها بشرط إشعار البنك قبل سحب الوديعة بمدة معينة تُسمى:", options: ["الودائع الثابتة", "الودائع بإخطار", "الودائع الأجل", "الودائع الجارية"], correct: [1], multi: 1, explanation: "الودائع بإخطار." },
+      { id: 213, q: "البطاقات التي يطلب البنك المركزي السعودي من كافة البنوك إصدارها وتقدم جميع الخدمات للعميل النهائي دون رسوم، بصرف النظر عن جهاز السحب الآلي المستخدم أو الجهة المشغلة له هي:", options: ["بطاقة الائتمان", "بطاقة الماستر كارد", "بطاقة الصراف الآلي", "بطاقة أمريكان إكسبريس"], correct: [2], multi: 1, explanation: "بطاقة الصراف الآلي (مدى)." },
+      { id: 214, q: "تكون الفائدة على حسابات الودائع الثابتة أعلى من الفائدة على حسابات الادخار بسبب:", options: ["صاحب حساب الادخار يستطيع السحب متى ما أراد، أما صاحب الوديعة الثابتة فإنه لا يستطيع سحب مبلغه قبل التاريخ المتفق عليه", "صاحب الوديعة الثابتة يستطيع السحب متى ما أراد، أما صاحب حساب الادخار فإنه لا يستطيع سحب مبلغه قبل التاريخ المتفق عليه", "حسابات الودائع الثابتة تكون بعملات أجنبية بينما حسابات الادخار تكون بالعملة المحلية", "حسابات الادخار تكون بعملات أجنبية بينما حسابات الودائع الثابتة تكون بالعملة المحلية"], correct: [0], multi: 1, explanation: "تجميد المبلغ في الوديعة الثابتة طوال المدة المتفق عليها." },
+      { id: 215, q: "تُعد خدمة فتح الاعتمادات المستندية من الوسائل التي عن طريقها:", options: ["تستطيع الشركة أن تستثمر أموالها في استثمارات عالمية", "يستطيع الفرد أن يستثمر أمواله في استثمارات عالمية", "تستطيع الشركة أن تستورد بضاعتها من الخارج", "يستطيع الفرد أن يقوم باعتماد مستنداته لدى الجهات الحكومية"], correct: [2], multi: 1, explanation: "تسهيل الاستيراد والتصدير والتجارة الخارجية للشركات." },
+      { id: 216, q: "تصدر بطاقة الصراف الآلي من المصرف لمن له رصيد في حسابه، ومن أهم خصائصها:", options: ["تخوّل بطاقة الصراف الآلي لحاملها السحب، أو تسديد أثمان السلع والخدمات بقدر رصيده المتاح", "تخوّل بطاقة الصراف الآلي صاحبها للحصول على الائتمان", "يتحمل العميل دائماً رسوماً مقابل استخدامه بطاقة الصراف الآلي", "فرض رسوم إدارية على كل عملية شراء أو تسديد رسوم الخدمات العامة"], correct: [0], multi: 1, explanation: "السحب والشراء في حدود الرصيد المتاح في الحساب." },
+      { id: 217, q: "يُطلق على الحساب الذي يُودع فيه مبلغ معين من المال لمدة زمنية معينة مقابل عائد بشرط أن العميل لا يستطيع سحب المبلغ قبل التاريخ المتفق عليه:", options: ["حساب الودائع الثابتة", "حساب جاري محدد المدة", "حساب الودائع بإخطار", "حساب ادخار"], correct: [0], multi: 1, explanation: "حساب الودائع الثابتة." },
+      { id: 218, q: "أي مما يأتي لا يُعد من الأوراق التجارية:", options: ["الكمبيالات", "الشيكات", "السندات الأذنية", "الأسهم"], correct: [3], multi: 1, explanation: "الأسهم أوراق مالية وليست أوراقاً تجارية." },
+      { id: 219, q: "يجب على البنك قبول فتح حساب لأي عميل دون اشتراط إيداع أي مبالغ فيه، ويجري قفل الحساب في حالة عدم إيداع أي مبالغ خلال:", options: ["30 يوماً", "60 يوماً", "90 يوماً", "120 يوماً"], correct: [2], multi: 1, explanation: "90 يوماً من تاريخ فتح الحساب." },
+      { id: 220, q: "أي من الفئات الآتية لا يُسمح لهم بفتح حسابات بنكية:", options: ["الأشخاص الطبيعيون الوافدون بتأشيرة زيارة لأداء مهام لجهات في المملكة", "الشخص الطبيعي الحاج الأجنبي", "الوافد المقيم بموجب الإقامة المؤقتة في تأشيرة العمل (تسعين يوماً) في جواز السفر", "الشخص الطبيعي الوافد الحاصل على إقامة"], correct: [0], multi: 1, explanation: "الوافدون بتأشيرة زيارة لا يُسمح لهم بفتح حسابات بنكية." },
+      { id: 221, q: "يُعد الحساب راكداً، إذا أكمل مدة .... من تاريخ آخر عملية أجراها العميل:", options: ["أربعة وعشرين شهراً ميلادياً", "اثني عشر شهراً ميلادياً", "ستة أشهر ميلادية", "ثلاثة أشهر ميلادية"], correct: [0], multi: 1, explanation: "24 شهراً ميلادياً (سنتان)." },
+      { id: 222, q: "الشخص الممنوع بموجب صك شرعي يثبت الحالة المانعة من التصرف في ماله إما لسفه أو ذهاب عقل، يُطلق عليه مصطلح:", options: ["القاصر", "الولي", "المحجور عليه", "الحاضن"], correct: [2], multi: 1, explanation: "المحجور عليه." },
+      { id: 223, q: "يُسمح بقبول الحوالات الواردة والشيكات وفق الحالات الآتية:", options: ["إذا كانت الحوالة أو الشيك من حساب وهمي إلى مستفيد طبيعي أو اعتباري على أحد فروع البنك يُسمح بصرف الحوالة أو الشيك نقداً إلى المستفيد أو وكيله الشرعي", "إذا كانت الحوالة أو الشيك من بنك محلي إلى بنك محلي آخر يتطلب أن تكون من حساب المحول إلى حساب المحول إليه", "إذا كانت الحوالة أو الشيك واردة من خارج المملكة بغير اسم المستفيد الشخصي ولا يُشترط أن يكون مفتوحاً وقت استقبال الحوالة", "إذا كانت الحوالة أو الشيك غير محددة باسم إلى مستفيد طبيعي أو اعتباري على أحد فروع البنك يُسمح بصرف الحوالة أو الشيك نقداً إلى المستفيد أو وكيله الشرعي"], correct: [1], multi: 1, explanation: "التحويل بين البنوك المحلية يتطلب أن يكون من حساب المحول إلى حساب المحول إليه." },
+      { id: 224, q: "عندما يُودع العميل في حسابه شيكاً للتحصيل مسحوباً على بنك آخر، فإن تظهير المستفيد في هذه الحالة يُسمى:", options: ["التظهير الاسمي", "التظهير على بياض", "التظهير الخاص", "التظهير التوكيلي"], correct: [3], multi: 1, explanation: "التظهير التوكيلي (توكيل البنك بتحصيل قيمة الشيك)." },
+      { id: 225, q: "السوق التي يتم فيها نشأة قروض التمويل العقاري وضمانها وتسويتها وخدمتها بواسطة مؤسسات التمويل العقاري، تُسمى:", options: ["السوق الثانوية", "السوق الأولية", "السوق الموازية", "سوق رأس المال"], correct: [1], multi: 1, explanation: "السوق الأولية للتمويل العقاري." },
+      { id: 226, q: "السوق التي يتم فيها تداول حقوق الممول العقاري والأوراق المالية المضمونة بالرهون العقارية، تُسمى:", options: ["السوق الموازية", "السوق الأولية", "السوق الثانوية", "سوق رأس المال"], correct: [2], multi: 1, explanation: "السوق الثانوية للتمويل العقاري." },
+      { id: 227, q: "يُستثنى برنامج التمويل المدعوم والمقدم بالتعاون مع برامج صندوق التنمية العقاري الذي يهدف إلى تخفيف عبء الدفعة المقدمة التي تشترطها جهات التمويل عند شراء عقار بموجب تمويل عقاري حيث يتم زيادة نسبة التمويل لتصل إلى:", options: ["(70%) من قيمة المسكن محل عقد التمويل العقاري", "(80%) من قيمة المسكن محل عقد التمويل العقاري", "(90%) من قيمة المسكن محل عقد التمويل العقاري", "(95%) من قيمة المسكن محل عقد التمويل العقاري"], correct: [2], multi: 1, explanation: "90% من قيمة المسكن." },
+      { id: 228, q: "إذا أكمل الحساب مدة أربعة وعشرين (24) شهراً ميلادياً بدءاً من تاريخ آخر عملية أجراها العميل أو وكيله المفوض أو ورثته مسجلة أو مراسلة موثوقة وموثقة يُطلق عليه حساب:", options: ["حساب نشط", "حساب راكد", "حساب متروك", "حساب غير مطالب به"], correct: [1], multi: 1, explanation: "حساب راكد." },
+      { id: 229, q: "على جهات التمويل بائعة المديونية تنفيذ طلب العميل الراغب في تحويل المديونية باستكمال النماذج الخاصة بتحويل مديونية التمويل العقاري خلال مدة (------):", options: ["لا تتجاوز ثلاثة أيام عمل من تاريخ تلقي الطلب", "لا تتجاوز خمسة أيام عمل من تاريخ تلقي الطلب", "لا تتجاوز سبعة أيام عمل من تاريخ تلقي الطلب", "لا تتجاوز عشرة أيام عمل من تاريخ تلقي الطلب"], correct: [1], multi: 1, explanation: "خلال مدة لا تتجاوز خمسة أيام عمل." },
+      { id: 230, q: "على جهات التمويل بائعة المديونية إتمام معالجة طلب العميل خلال مدة (-------) من تاريخ تلقي موافقة جهة التمويل الراغبة في شراء المديونية على تحويل المديونية:", options: ["لا تتجاوز ثلاثة أيام عمل", "لا تتجاوز خمسة أيام عمل", "لا تتجاوز سبعة أيام عمل", "لا تتجاوز عشرة أيام عمل"], correct: [1], multi: 1, explanation: "خلال مدة لا تتجاوز خمسة أيام عمل." },
+      { id: 231, q: "البطاقة التي تُلزم حاملها بسداد كامل المبلغ المستحق عند استلامه كشف الحساب أو في تاريخ الاستحقاق المحدد في كشف الحساب هي:", options: ["بطاقة الائتمان", "بطاقة الحسم الشهري", "بطاقة الشركات", "بطاقة أعمال"], correct: [1], multi: 1, explanation: "بطاقة الحسم الشهري." },
+      { id: 232, q: "في حال طلب إصدار بطاقة ائتمان جديدة، فإن الحد الأدنى لإجمالي الدخل السنوي لحامل البطاقة ينبغي أن يكون:", options: ["(12,000) ريال لعملاء البنك", "(15,000) ريال لغير عملاء البنك", "(24,000) ريال لعملاء البنك ومبلغ (30,000) ريال لغير عملاء البنك", "(36,000) ريال لعملاء البنك ومبلغ (60,000) ريال لغير عملاء البنك"], correct: [2], multi: 1, explanation: "24,000 ريال لعملاء البنك و30,000 ريال لغير عملاء البنك." },
+      { id: 233, q: "أي مما يأتي يُعد صحيحاً فيما يتعلق بحقوق والتزامات حامل بطاقة الائتمان أو بطاقة الحسم الشهري:", options: ["يُلزم على حامل البطاقة تزويد الجهة المصدرة للبطاقة بمعلوماته المحدثة وأي تغيير في تفاصيل معلومات الاتصال به", "لا يحق لحامل البطاقة إلغاء اتفاقية بطاقة الائتمان وبطاقة الحسم الشهري خلال (10) أيام من استلام البطاقة", "يحق للجهات المصدرة للبطاقات زيادة تكلفة الأجل على الرصيد القائم بسبب التأخر في السداد أو التعثر", "يحق للجهات المصدرة للبطاقات احتساب رسوم على عمليات التحويل بين الحساب الجاري لحامل البطاقة وحساب بطاقة الائتمان أو بطاقة الحسم الشهري في نفس البنك"], correct: [0], multi: 1, explanation: "يلتزم حامل البطاقة بتزويد الجهة المصدرة بمعلوماته المحدثة." },
+      { id: 234, q: "ينبغي ألا تتجاوز رسوم السحب النقدي من بطاقة الائتمان:", options: ["150 ريالاً سعودياً لكل عملية سحب نقدي بمبلغ (5000) ريال سعودي وأقل", "100 ريال سعودي لكل عملية سحب نقدي بمبلغ (5000) ريال سعودي وأقل", "3% من مبلغ العملية لكل عملية تتجاوز (5000) ريال سعودي، وبحد أقصى (300) ريال سعودي", "5% من مبلغ العملية لكل عملية تتجاوز (5000) ريال سعودي، وبحد أقصى (600) ريال سعودي"], correct: [2], multi: 1, explanation: "3% بحد أقصى 300 ريال لما يتجاوز 5000 ريال." },
+      { id: 235, q: "يجب أن يحجب البنك توقيع العميل ورصيده من شاشات الفروع نهائياً إذا استمر الحساب دون حركة مالية لمدة:", options: ["خمس سنوات", "سنة واحدة", "ستة أشهر", "90 يوماً"], correct: [0], multi: 1, explanation: "بعد مرور خمس سنوات دون حركة (الحساب المتروك)." },
+      { id: 236, q: "إذا اختلف مبلغ الشيك المدون بالحروف عن المبلغ المدون بالأرقام، تكون العبرة في هذه الحالة بالمبلغ:", options: ["المكتوب بالأرقام", "المكتوب بالحروف", "الأقل قيمة", "الأكبر قيمة"], correct: [1], multi: 1, explanation: "المبلغ المكتوب بالحروف." },
+      { id: 237, q: "أي مما يأتي يُمثل أحد أوجه الاتفاق في الخدمات المصرفية بين المصارف الإسلامية والبنوك التقليدية:", options: ["عدم التعامل بالفائدة المصرفية", "الرقابة الشرعية", "الخضوع لإشراف ورقابة البنك المركزي السعودي والالتزام بتعليماته", "الالتزام بتطبيق أحكام الشريعة الإسلامية"], correct: [2], multi: 1, explanation: "كلاهما يخضع لإشراف ورقابة البنك المركزي السعودي." },
+      { id: 238, q: "يُسمى العقد بين المصرف الإسلامي والعميل للمساهمة في رأس المال بنسب متساوية أو متفاوتة في إنشاء مشروع جديد أو تطوير مشروع قائم، أو في تملك عقار، أو أصل منقول، سواءً على أساس دائم أو متناقص بـ:", options: ["عقد مرابحة", "عقد مشاركة", "عقد مضاربة", "عقد سندات"], correct: [1], multi: 1, explanation: "عقد مشاركة." },
+      { id: 239, q: "يُسمى مشاركة المصرف شخصاً طبيعياً أو اعتبارياً أو أكثر في مشروع معين، وذلك عن طريق التمويل المشترك في المشروع وتبقى فيها حصة كل طرف في رأس المال والربح على حالها مادامت الشركة قائمة، ولا تتغير هذه النسبة إلا باتفاق جديد وعقد جديد بـ:", options: ["المشاركة المستمرة", "المشاركة المؤقتة", "المشاركة المتناقصة", "المشاركة المنتهية بالتمليك"], correct: [0], multi: 1, explanation: "المشاركة المستمرة (الثابتة)." },
+      { id: 240, q: "تُسمى العملية الاستثمارية التي تقوم على اتفاق بين طرفين هما رب المال والطرف المختص باستثمار المال، حيث يساهم رب المال برأس مال في مؤسسة أو نشاط يديره رب العمل بـ:", options: ["المشاركة", "المضاربة", "المرابحة", "الاستصناع"], correct: [1], multi: 1, explanation: "المضاربة." },
+      { id: 241, q: "يُقصد بالمضارب في عقد المضاربة:", options: ["الطرف الذي يدير العمل والمشروع مقابل أجر يؤخذ كنسبة من أرباح المشروع", "الطرف الذي يقدم رأس مال المشروع", "الطرف الذي يتحمل خسائر المشروع", "رب المال"], correct: [0], multi: 1, explanation: "المضارب هو الطرف الذي يدير العمل والمشروع." },
+      { id: 242, q: "يُسمى عقد المضاربة الذي يفوّض فيه رب المال المضارب في أن يدير عمليات المضاربة دون أن يقيده بقيود بـ:", options: ["المضاربة المقيدة", "المضاربة المتناقصة", "المضاربة المنتهية بالتمليك", "المضاربة المطلقة"], correct: [3], multi: 1, explanation: "المضاربة المطلقة." },
+      { id: 243, q: "يُسمى العقد الذي يبيع فيه المصرف الإسلامي لعميله نوعاً معلوماً من الأصول اشتراها المصرف بناءً على طلب العميل بسعر التكلفة مضافاً إليها هامش ربح متفق عليه بـ:", options: ["الإجارة", "المضاربة", "المرابحة", "المشاركة"], correct: [2], multi: 1, explanation: "المرابحة للآمر بالشراء." },
+      { id: 244, q: "تمر عملية البيع بالمرابحة للأمر بالشراء بالمراحل الآتية على التوالي:", options: ["مرحلة التملك - مرحلة المواعدة - مرحلة البيع", "مرحلة المواعدة - مرحلة التملك - مرحلة البيع", "مرحلة المواعدة - مرحلة البيع - مرحلة التملك", "مرحلة البيع - مرحلة التملك - مرحلة المواعدة"], correct: [1], multi: 1, explanation: "المواعدة أولاً -> ثم تملك المصرف للأصل -> ثم البيع للعميل." },
+      { id: 245, q: "تُسمى عقود الإجارة التي تقدم للمستأجر خياراً بامتلاك الأصل عند نهاية فترة الإجارة أما بشراء الأصل مقابل ثمن رمزي أو بدفع القيمة السوقية أو بموجب عقد هبة:", options: ["الإجارة التشغيلية", "الإجارة المنتهية بالتمليك", "الإجارة المتناقصة", "الإجارة الدائمة"], correct: [1], multi: 1, explanation: "الإجارة المنتهية بالتمليك." },
+      { id: 246, q: "يُسمى الاتفاق مع عميل على بيع أو شراء أصل ربما لم ينشأ بعد، على أن تكون صناعته أو بناؤه وفقاً لمواصفات المشتري النهائي وتسليمه له في تاريخ مستقبلي محدد بسعر بيع محدد سلفاً بـ:", options: ["المشاركة", "المضاربة", "المرابحة", "الاستصناع"], correct: [3], multi: 1, explanation: "الاستصناع." },
+      { id: 247, q: "تتميز الصكوك من الناحية المالية عن الأوراق المالية الأخرى المتداولة في الأسواق بأنها:", options: ["ذات مخاطر متدنية مقارنة بالأسهم", "ذات مخاطر مرتفعة مقارنة بالأسهم", "ذات إيراد غير قابل للتوقع مقارنة بالأسهم", "ذات دخل دوري غير مستقر نسبياً مما تجعله غير قابل للتوقع"], correct: [0], multi: 1, explanation: "الصكوك ذات مخاطر متدنية وعائد أكثر استقراراً مقارنة بالأسهم." },
+      { id: 248, q: "تختلف الأسهم عن الصكوك، حيث إن الأسهم:", options: ["ليست دائمة دوام الشركة المصدرة لها كما هو حال الصكوك بل إنّ لها أجلاً يجري تصفيتها فيه", "ثمنها في السوق أقل تقلباً ومن ثم يكون قابلاً للتوقع ويحقق الاستقرار", "يحصل حاملها عند التصفية على نصيبه من أصول الشركة عند تصفيتها بعد تسديد ما عليها من ديون", "يسترد حاملها رأسماله عند التصفية بصرف النظر عن قيمة أصول المصدر لها أو قدرته على سداد ديونه"], correct: [2], multi: 1, explanation: "حامل السهم شريك في الملكية ويحصل على نصيبه بعد سداد الديون عند التصفية." },
+      { id: 249, q: "أي من الأوراق المالية الآتية يكون لها حق التصويت في الجمعية العامة للشركة المساهمة:", options: ["الصكوك", "السندات", "الأسهم الممتازة", "الأسهم العادية"], correct: [3], multi: 1, explanation: "الأسهم العادية تمنح حاملها حق التصويت." },
+      { id: 250, q: "يختلف التوريق التقليدي عن التوريق الإسلامي، حيث إن السندات كمثال للتوريق التقليدي تمثل:", options: ["حصصاً شائعة في ملكية أصول قائمة فعلاً", "ديناً بفائدة لحاملها في ذمة مصدرها", "أوراقاً مالية يمكن للمصارف الإسلامية إصدارها وتداولها شرعاً", "أوراقاً مالية يتحمل المستثمرون فيها مخاطر مرتفعة"], correct: [1], multi: 1, explanation: "السندات تمثل ديناً بفائدة في ذمة المصدر." },
+      { id: 251, q: "تمكين البنك من تكوين تصور مناسب عن الهوية الحقيقية لكل عميل يُعد تطبيقاً لمبدأ:", options: ["تضارب المصالح", "حماية خصوصية المعلومات", "اعرف عميلك", "الإفصاح والشفافية"], correct: [2], multi: 1, explanation: "مبدأ اعرف عميلك (KYC)." },
+      { id: 252, q: "وضع برامج وآليات مناسبة لتطوير معارف ومهارات العملاء، يكون وفقاً لمبدأ:", options: ["الإفصاح والشفافية", "التثقيف والتوعية المالية", "معالجة الشكاوى", "المعاملة بعدل وإنصاف"], correct: [1], multi: 1, explanation: "مبدأ التثقيف والتوعية المالية." },
+      { id: 253, q: "تزويد عميل البنك بفاتورة تتضمن الأسعار والعمولات التي يتقاضاها المصرف، يكون وفقاً لمبدأ:", options: ["حماية خصوصية المعلومات", "المعاملة بعدل وإنصاف", "الإفصاح والشفافية", "اعرف عميلك"], correct: [2], multi: 1, explanation: "مبدأ الإفصاح والشفافية." },
+      { id: 254, q: "من ضمن مسؤوليات عملاء البنك ما يأتي:", options: ["وضع أنظمة رقابية للحد من عمليات الاحتيال", "نشر برامج التوعية والتثقيف المستمرة", "توفير آلية مناسبة لتقديم الشكاوى", "الصدق عند تقديم المعلومات"], correct: [3], multi: 1, explanation: "الصدق عند تقديم المعلومات من مسؤوليات العميل." },
+      { id: 255, q: "أي مما يأتي يُعد من المهارات الفنية لموظفي خدمة العملاء في البنوك:", options: ["التحلي بالصبر وضبط النفس", "معرفة أسعار وشروط الخدمات والمنتجات المقدمة في البنك", "اللباقة في التعامل وتحقيق الاحتياجات", "فهم حاجات ورغبات وتوقعات العملاء"], correct: [1], multi: 1, explanation: "معرفة الأسعار والشروط والمنتجات مهارة فنية." },
+      { id: 256, q: "تطوير وتحسين إجراءات تقديم الخدمات في البنوك يمثل تميزاً تسويقياً في مجال:", options: ["المنتجات أو الخدمات", "المكان", "التسعير", "الترويج"], correct: [0], multi: 1, explanation: "في مجال المنتجات أو الخدمات." },
+      { id: 257, q: "أي مما يأتي يعبر عن الهدف من إعداد مدونة سلوك الأعمال:", options: ["تفسير الإجراءات والعمليات التي يُجرى عن طريقها إدارة مخاطر عدم الالتزام", "تحديد هوية العملاء والمستفيدين الحقيقيين والتحقق من أوضاعهم النظامية", "التعرف على المخاطر الرئيسة لعدم الالتزام التي تواجه البنك", "إرساء مبادئ الانضباط الوظيفي والشفافية والنزاهة والموضوعية في سلوك موظفي البنك"], correct: [3], multi: 1, explanation: "إرساء مبادئ الانضباط والشفافية والنزاهة والموضوعية في سلوك الموظفين." },
+      { id: 258, q: "تُعد النزاهة من القيم الأساسية لقواعد السلوك، ويُقصد بها:", options: ["أن يلتزم البنك بالإعلان عن رسالته وأهدافه وسياساته المطبقة", "أن يكون كافة موظفي البنك فوق مستوى الشبهات والابتعاد عن المصالح الشخصية", "أن تلتزم البنوك بالتعامل بعدل مع كافة الأطراف", "تمتع موظفي البنك بكفاءة مهنية عالية تؤهلهم أداء أعمالهم على الوجه الأكمل"], correct: [1], multi: 1, explanation: "أن يكون الموظفون فوق مستوى الشبهات والابتعاد عن المصالح الشخصية." },
+      { id: 259, q: "يُقصد بمبدأ الموضوعية كأحد القيم الأساسية لقواعد السلوك:", options: ["أن يلتزم موظفو البنوك بالمحافظة على كافة الوثائق والمستندات التي تكون في عهدتهم", "الالتزام بعدم إفشاء المعلومات والبيانات المتعلقة بأعمال البنك", "التزام كافة موظفي البنك بالقوانين والتشريعات والتعاميم والمعايير المهنية", "التزام موظفي البنوك بحسن المظهر والصحة العامة داخل البنك وخارجه"], correct: [2], multi: 1, explanation: "الالتزام بالقوانين والتشريعات والمعايير المهنية بحياد وموضوعية." },
+      { id: 260, q: "أي مما يأتي يُعد من قيم الكفاءة المهنية لقواعد السلوك:", options: ["التعلم المستمر وتأهيل الذات", "تجنب تضارب المصالح", "الإخلاص والولاء للوطن", "احترام عادات وتقاليد المجتمع"], correct: [0], multi: 1, explanation: "التعلم المستمر وتأهيل الذات." },
+      { id: 261, q: "أي مما يأتي يُعد بمثابة التزام للبنوك تجاه موظفيها:", options: ["المحافظة على سرية معلومات العملاء", "توفير كافة خدمات البنوك للعملاء بعدالة وبدون تمييز", "تهيئة عادلة وصحيحة تلبي المتطلبات والاحتياجات الأساسية للموظفين", "مكافحة غسل الأموال وتمويل الإرهاب"], correct: [2], multi: 1, explanation: "توفير بيئة عمل عادلة وصحيحة تلبي احتياجات الموظفين." },
+      { id: 262, q: "يمثل التأكد من تطبيق وتنفيذ التعليمات والإجراءات وفقاً للأنظمة والقواعد والتعليمات الصادرة من السلطات التنظيمية والجهات الرقابية تطبيقاً لمفهوم:", options: ["اعرف عميلك (KYC)", "الالتزام", "العناية الواجبة (CDD)", "الاحتيال"], correct: [1], multi: 1, explanation: "مفهوم الالتزام." },
+      { id: 263, q: "اعتماد سياسة الالتزام الخاصة بالبنك، تكون من مسؤوليات:", options: ["مجلس الإدارة", "الإدارة العليا", "إدارة الالتزام", "مسؤول الالتزام"], correct: [0], multi: 1, explanation: "مجلس الإدارة." },
+      { id: 264, q: "من مسؤوليات إدارة الالتزام ما يأتي:", options: ["اعتماد وثيقة رسمية بإنشاء إدارة التزام دائمة وفعالة", "توفير الموارد الكافية للجهة المسؤولة عن مهام الالتزام", "مساعدة الإدارة العليا على إدارة مخاطر عدم الالتزام", "مراجعة أنشطة الجهة المسؤولة عن مهام الالتزام بصورة دورية"], correct: [2], multi: 1, explanation: "مساعدة الإدارة العليا على إدارة مخاطر عدم الالتزام." },
+      { id: 265, q: "تُعد أية ممارسة تنطوي على استخدام الخداع للحصول المباشر أو غير المباشر على استفادة مالية بمثابة:", options: ["غسل أموال", "احتيال مالي", "تمويل إرهاب", "تهريب أموال"], correct: [1], multi: 1, explanation: "احتيال مالي." },
+      { id: 266, q: "أي مما يأتي يُعد مثالاً للاحتيال الخارجي:", options: ["تلاعب أحد موظفي المنشأة في حسابات العملاء", "الخطأ في تسجيل العمليات في السجلات", "انتحال عميل معين لشخصية عميل آخر", "عدم الالتزام بالقواعد المنظمة للعمل"], correct: [2], multi: 1, explanation: "انتحال عميل لشخصية عميل آخر احتيال خارجي." },
+      { id: 267, q: "أي من العمليات الآتية تُعد بمثابة احتيال داخلي:", options: ["استخدام العميل لهوية مزيفة", "إدخال العميل بيانات غير سليمة من خلال الحاسب الآلي", "محاولة العميل تبديل عملات نقدية مزيفة", "تعمد محاسب مركز الصرافة إجراء قيود يومية خاطئة"], correct: [3], multi: 1, explanation: "تعمد المحاسب إجراء قيود خاطئة احتيال داخلي." },
+      { id: 268, q: "يُعد تلاعب محاسب البنك في تسجيل العمليات المالية نوعاً من:", options: ["الاحتيال الداخلي", "الاحتيال الخارجي", "غسل الأموال", "عدم اتباع سياسات الالتزام"], correct: [0], multi: 1, explanation: "الاحتيال الداخلي." },
+      { id: 269, q: "ارتكاب أي فعل يُقصد منه إخفاء أو تمويه حقيقة أموال مكتسبة لتبدو كأنها مشروعة المصدر، يُعد نوعاً من:", options: ["الاحتيال المالي", "غسل الأموال", "تمويل الإرهاب", "عدم اتباع سياسات الالتزام"], correct: [1], multi: 1, explanation: "غسل الأموال." },
+      { id: 270, q: "تتضمن عمليات غسل الأموال، عملية إدخال الأموال الناتجة من مصدر غير مشروع إلى النظام المالي وتُسمى بمرحلة:", options: ["التغطية", "الدمج", "الإيداع", "السيطرة"], correct: [2], multi: 1, explanation: "مرحلة الإيداع (المرحلة الأولى)." },
+      { id: 271, q: "عملية إخفاء المصدر غير المشروع للأموال وذلك لكسر عملية تتبع تلك الأموال تُسمى بمرحلة:", options: ["الدمج", "التغطية", "الإحلال", "التدوير"], correct: [1], multi: 1, explanation: "مرحلة التغطية (المرحلة الثانية)." },
+      { id: 272, q: "تُسمى عملية إعادة إدخال الأموال المغسولة مرة أخرى في النظام الاقتصادي المشروع بحيث تبدو كأصول مشروعة بمرحلة:", options: ["الدمج", "التغطية", "التدوير", "الإحلال"], correct: [0], multi: 1, explanation: "مرحلة الدمج (المرحلة الثالثة)." },
+      { id: 273, q: "يُعد كل فعل يتضمن جمع أموال وتقديمها لأي نشاط إرهابي سواء بشكل مباشر أو غير مباشر بمثابة:", options: ["غسل أموال", "احتيال مالي", "تمويل إرهاب", "عدم اتباع سياسات الالتزام"], correct: [2], multi: 1, explanation: "تمويل إرهاب." },
+      { id: 274, q: "استخدام عائدات الأنشطة الإجرامية في شراء السلع مرتفعة القيمة التي يمكن تداولها بسهولة، تُعد من طرق:", options: ["الاحتيال الداخلي", "غسل الأموال", "الاحتيال الخارجي", "عدم اتباع سياسات الالتزام"], correct: [1], multi: 1, explanation: "من طرق وأنماط غسل الأموال." },
+      { id: 275, q: "أي من العمليات الآتية من أمثلة الأنماط المتعلقة بغسل الأموال وتمويل الإرهاب:", options: ["الخطأ في تسجيل العمليات في السجلات", "تلاعب أحد موظفي مركز الصرافة في حسابات العملاء", "استخدام المنظمات غير الهادفة للربح لجمع الأموال وإخفاء مصدرها", "عدم التزام الموظفين بالقواعد المنظمة للعمل في البنك"], correct: [2], multi: 1, explanation: "استغلال المنظمات غير الهادفة للربح." },
+      { id: 276, q: "أي مما يأتي يُعد من مؤشرات الاشتباه بعملية غسل الأموال:", options: ["استعداد العميل لشراء صفقات بسعر أعلى من سعر السوق أو بيعها بسعر أقل من سعر السوق", "تقديم العميل للمعلومات الضرورية اللازمة لمتطلبات قاعدة اعرف عميلك", "تقديم العميل لوثائق إثبات شخصية صحيحة", "التمكن من التواصل مع العميل بشكل دائم من خلال بيانات الاتصال المقدمة من العميل"], correct: [0], multi: 1, explanation: "الشراء بسعر أعلى من السوق أو البيع بأقل منه دون مبرر اقتصادي مؤشر اشتباه." },
+      { id: 277, q: "يلزم لمنع الاحتيال، عمل موظف البنك الآتي:", options: ["تسجيل المعاملات المالية بالطريقة السليمة", "الإبلاغ عن المعاملات والسلوكيات المشبوهة", "مصادرة الأموال المشبوهة", "تخطيط الأهداف الشخصية بما يتوافق مع أهداف المنشأة"], correct: [1], multi: 1, explanation: "الإبلاغ الفوري عن المعاملات والسلوكيات المشبوهة." },
+      { id: 278, q: "أي من الإجراءات الآتية يلزم على البنك اتخاذها بعد الإبلاغ عن العمليات المشتبه بها في غسل الأموال:", options: ["إبلاغ العميل أو المستفيد من العملية بإجراءات الإبلاغ", "الاحتفاظ بسجلات ونسخ من البلاغ والتقرير الفني وملحقاته", "التخلص من سجلات البلاغ لانتهاء العملية", "إنذار العميل والتنبيه عليه بعدم تكرار تلك العمليات"], correct: [1], multi: 1, explanation: "الاحتفاظ بسجلات ونسخ البلاغ والتقرير الفني بسرية تامة." },
+      { id: 279, q: "أي مما يأتي يُعد من مهام إدارة مكافحة غسل الأموال وتمويل الإرهاب بالبنك:", options: ["التنبيه على العملاء بعدم تكرار العمليات المشتبه بها", "التخلص من ملفات البلاغات التي سبق الإبلاغ عنها", "استقبال البلاغات عن العمليات المشتبه بها من كافة إدارات البنك", "تطوير برامج التوعية وتثقيف العملاء"], correct: [2], multi: 1, explanation: "استقبال البلاغات الداخلية من كافة إدارات وفروع البنك." },
+      { id: 280, q: "يُعد عدم الإبلاغ عن العمليات المشتبه بها جريمة عقوبتها:", options: ["تصل إلى السجن ثلاث سنوات", "غرامة تصل إلى 5,000,000 ريال", "السجن بما لا يزيد عن سنتين وغرامة لا تزيد عن 500,000 ريال أو بأحدهما", "السجن بما يزيد عن سنتين وغرامة تزيد عن 500,000 ريال أو بأحدهما"], correct: [2], multi: 1, explanation: "السجن بما لا يزيد عن سنتين وغرامة لا تزيد عن 500,000 ريال أو بإحداهما." },
+      { id: 281, q: "إنشاء قاعدة بيانات تتضمن جميع المسائل المتعلقة بغسل الأموال وتمويل الإرهاب والمتمثلة في الحالات المشتبه بها التي تم الإبلاغ عنها، تُعد من مهام:", options: ["الإدارة العليا", "إدارة مكافحة غسل الأموال وتمويل الإرهاب", "مجلس الإدارة", "إدارة الالتزام"], correct: [1], multi: 1, explanation: "إدارة مكافحة غسل الأموال وتمويل الإرهاب." },
+      { id: 282, q: "أي من المهام الآتية تكون من مسؤولية وحدة مكافحة غسل الأموال لدى البنك:", options: ["اعتماد سياسة الالتزام الخاصة بالبنك", "التعرف على المخاطر الرئيسة لعدم الالتزام التي تواجه البنك ووضع الخطط التصحيحية", "إبلاغ وحدة التحريات المالية فور تحديد الاشتباه وإعداد تقرير فني مفصل عن أية حالة مشتبه بها", "تحديد وتوثيق وتقييم مخاطر عدم الالتزام ذات الصلة بأنشطة البنك"], correct: [2], multi: 1, explanation: "إبلاغ الإدارة العامة للتحريات المالية فور تحديد الاشتباه." },
+      { id: 283, q: "أي من المهام الآتية تكون من مسؤولية وحدة التحريات المالية:", options: ["إعداد برنامج تثقيف وتوعية وتدريب عن الالتزام لكافة أفراد الإدارة العليا ومديري الإدارات والموظفين", "تلقي البلاغات الواردة من المؤسسات المالية عن العمليات التي يشتبه في أنها جريمة غسل الأموال", "وضع سياسة الالتزام واعتمادها من قبل مجلس الإدارة", "توفير الموارد الكافية للجهة المسؤولة عن مهام الالتزام"], correct: [1], multi: 1, explanation: "تلقي بلاغات الاشتباه الواردة من المؤسسات المالية." },
+      { id: 284, q: "أي مما يأتي يُعد من الأهداف الرئيسية لعمليات غسل الأموال:", options: ["الحصول على منافع أو مستندات لا يحق للمستلم أن يحصل عليها", "دعم قيم الأمانة والنزاهة وتعزيزها", "زيادة صعوبة إمكانية تعقب الأموال من قبل الجهات الأمنية", "السرقة أو إساءة استخدام أصول البنك بشكل متعمد"], correct: [2], multi: 1, explanation: "زيادة صعوبة تعقب مصدر الأموال غير المشروعة." },
+      { id: 285, q: "أي مما يأتي يُعد من الآثار السلبية لعمليات غسل الأموال على مستوى الاقتصاد الوطني:", options: ["انتشار الفساد السياسي والإداري واستغلال النفوذ", "إعاقة التطور الاقتصادي في الدولة وانخفاض فرص الاستثمار الحقيقية", "صعود فئات اجتماعية دنيا إلى أعلى الهرم الاجتماعي", "حرمان مركز الصرافة من ممارسة المهنة وإلغاء الترخيص"], correct: [1], multi: 1, explanation: "إعاقة التطور الاقتصادي وانخفاض فرص الاستثمار الحقيقية." },
+      { id: 286, q: "ينبغي على البنك إجراء صيانة دورية لكافة أجهزة الصرف الآلي والتحقق من جاهزيتها واستمراريتها في جميع الأوقات، ويفضل استبدال أجهزة الصرف التي مضى على خدمتها أكثر من:", options: ["سبع سنوات", "تسع سنوات", "عشر سنوات", "عشرين سنة"], correct: [0], multi: 1, explanation: "يفضل استبدال أجهزة الصرف الآلي بعد مرور سبع سنوات." },
+      { id: 287, q: "في حال عدم تمكن البنك من إرسال أي حوالة خارجية بسبب إعادتها من البنك المراسل، ينبغي على البنك:", options: ["إبلاغ العملاء المتأثرين خلال يومي عمل", "الاتصال بالعملاء المتأثرين خلال نفس اليوم", "إبلاغ العملاء المتأثرين بعد أربعة أيام عمل", "استثمار المبلغ للعملاء المتأثرين"], correct: [0], multi: 1, explanation: "إبلاغ العملاء المتأثرين خلال يومي عمل." },
+      { id: 288, q: "ينبغي على البنك إبلاغ العميل بأي قرار يتخذه البنك في حال إغلاق حسابه قبل تاريخ صدور القرار بـ:", options: ["30 يوماً", "60 يوماً", "90 يوماً", "120 يوماً"], correct: [0], multi: 1, explanation: "قبل إغلاق الحساب بـ 30 يوماً (في الصيغة التي تذكر 30/60/90/120)." },
+      { id: 289, q: "في حال وجود شكوى لعميل المصرف، يجب على المصرف التواصل مع الشاكي وإحاطته في شأن شكواه خلال أسبوع من تاريخ استلامها وفي حال عدم إنهائها خلال هذه الفترة، فعليه إحاطته بآخر مستجدات الشكوى في موعد أقصاه:", options: ["5 أيام عمل", "7 أيام عمل", "10 أيام عمل", "30 يوم عمل"], correct: [2], multi: 1, explanation: "في موعد أقصاه 10 أيام عمل." },
+      { id: 290, q: "تقع على البنك مسؤولية المحافظة على سرية بيانات العميل، باستثناء الحالة الآتية:", options: ["عندما يكون الكشف عن المعلومات بموافقة العميل الشفهية", "عندما يكون الكشف عن المعلومات في مصلحة العميل", "عندما يكون الكشف عن المعلومات بموافقة المسؤولين في البنك", "عندما يكون الكشف عن المعلومات بموافقة العميل الكتابية"], correct: [3], multi: 1, explanation: "بموافقة العميل الكتابية الصريحة (أو بموجب النظام)." },
+      { id: 291, q: "أي مما يأتي لا يُعد من مسؤوليات العملاء عند التعامل مع البنوك:", options: ["المعاملة بعدل وإنصاف", "معرفة كيفية تقديم شكوى", "الصدق عند تقديم المعلومات", "عدم التعرض للمخاطر"], correct: [0], multi: 1, explanation: "المعاملة بعدل وإنصاف التزام على البنك وليس مسؤولية على العميل." },
+      { id: 292, q: "ينبغي على البنك إشعار العميل، بأن استخدام بطاقة الصرف الآلي سيترتب عليها رسوم سحب وفقاً للتعرفة المصرفية الصادرة من البنك المركزي عندما تتم:", options: ["عمليات السحب النقدي المنفذة داخل المملكة", "عمليات السحب النقدي المنفذة خارج المملكة", "عمليات سحب بين بنوك محلية", "حوالة بين الأفراد"], correct: [1], multi: 1, explanation: "عمليات السحب النقدي المنفذة خارج المملكة." },
+      { id: 293, q: "المهارات التي تتمثل في إتقان العمل والأسلوب الاحترافي لجوانب العمل ومتطلباته وشروطه وواجباته، وأن يكون لدى موظف البنك معرفة جيدة بطبيعة عمله في البنك من إجراءات وشروط خاصة بخدمات البنك ومنتجاته لتحقيق توقعات العملاء والمستفيدين الذين ينتظرون من الموظف والبنك تلبية احتياجاتهم ومتطلباتهم وحل مشكلاتهم ودعمهم هي:", options: ["المهارات السلوكية", "المهارات الأخلاقية", "المهارات الفنية", "المهارات النفسية"], correct: [2], multi: 1, explanation: "المهارات الفنية." },
+      { id: 294, q: "من أهم أهداف إدارة علاقات العملاء:", options: ["توفير معلومات ومدخلات لبحوث التسويق", "توفير معلومات عن حياة العملاء الشخصية", "توفير بيانات عن الاقتصاد الوطني", "زيادة معدلات الاحتفاظ بالعملاء"], correct: [3], multi: 1, explanation: "زيادة معدلات الاحتفاظ بالعملاء وولائهم." },
+      { id: 295, q: "تهدف مبادئ التمويل المسؤول إلى تشجيع التمويل الذي:", options: ["يلبي الاحتياجات الفعلية للعملاء", "يثقف العملاء حول مسؤولياتهم تجاه الاقتصاد", "يلبي حاجات الاقتصاد الفعلية", "يتوافق مع توجهات المسؤولين في الاقتصاد"], correct: [0], multi: 1, explanation: "تشجيع التمويل الذي يلبي الاحتياجات الفعلية للعملاء." },
+      { id: 296, q: "تكون الالتزامات الائتمانية الشهرية للتمويل الذي لا تكون فيه جميع الأقساط متساوية محسوبة بافتراض ثبات القسط الشهري عند مستوى:", options: ["أعلى قسط شهري لكافة الأقساط", "المتوسط الشهري لكافة الأقساط", "أقل قسط شهري لكافة الأقساط", "المتوسط الشهري للأقساط الشهرية"], correct: [0], multi: 1, explanation: "تُحتسب عند مستوى أعلى قسط شهري لكافة الأقساط." },
+      { id: 297, q: "عند احتساب نسب التحمل للعملاء الذين يبلغ إجمالي دخلهم الشهري (15,000) ريال فأقل، فإنه يجب ألا تتجاوز الالتزامات الائتمانية الشهرية المترتبة على التمويل نسبة معينة من إجمالي الدخل الشهري للعميل تساوي:", options: ["35%", "45%", "50%", "65%"], correct: [1], multi: 1, explanation: "45% من إجمالي الدخل الشهري." },
+      { id: 298, q: "عند احتساب إجمالي الدخل الشهري للعميل، يُحتسب من الدخل الآخر لإجمالي المبالغ المالية التي يحصل عليها الشخص من أي مصدر دخل دوري سواءً كان شهرياً أو سنوياً أو ذا فترة دورية أخرى:", options: ["نصف المتوسط الشهري", "نصف المتوسط السنوي", "مستوى المتوسط الشهري", "مستوى المتوسط السنوي"], correct: [0], multi: 1, explanation: "نصف المتوسط الشهري للدخول الأخرى." },
+      { id: 299, q: "يُعد فقدان المستندات والوثائق الأصلية واستبدالها بصور بمثابة مؤشر على:", options: ["غسل الأموال", "الاحتيال الخارجي", "الاحتيال الداخلي", "عدم اتباع سياسات الالتزام"], correct: [2], multi: 1, explanation: "مؤشر على الاحتيال الداخلي." },
+      { id: 300, q: "يُطلق على مجموعة المعايير الأخلاقية والقواعد والآداب السلوكية التي يجب أن يتحلى بها الموظف في مهنته تجاه عمله، وزملائه الموظفين، وتجاه المجتمع ككل، مصطلح:", options: ["أخلاقيات العمل", "المعلومات الداخلية", "العلاقة التكاملية", "التغذية العكسية"], correct: [0], multi: 1, explanation: "أخلاقيات العمل." },
+      { id: 301, q: "يجوز لمنسوبي المؤسسة المالية قبول الهدية بشرط:", options: ["أن تكون الهدية نقدية، أو على هيئة قروض", "أن تكون الهدية على هيئة أسهم أو مشتقات مالية", "أن تكون الهدية وقيمتها مما هو متعارف على تقديمه، وذلك بحسب المناسبة التي قدمت فيها وطبيعتها", "أن يكون لمقدم الهدية مصلحة خاصة أو عامة يرجو الحصول عليها من المؤسسة المالية أو أحد منسوبيها"], correct: [2], multi: 1, explanation: "أن تكون عينية رمزية ومتعارف على تقديمها بحسب المناسبة." },
+      { id: 302, q: "من الأساليب المقترحة للتعامل مع شكاوى العملاء ما يأتي:", options: ["عدم تقديم الخدمة حسب الوعد بتوفيرها من حيث التوقيت والسلوك", "ضعف المصداقية أو الثقة في مركز الصرافة", "عدم توفير معلومات عن المنتجات والخدمات البديلة المقدمة من مركز الصرافة", "التعرف على توقعات العملاء لمستويات الخدمة المقبولة"], correct: [3], multi: 1, explanation: "التعرف على توقعات العملاء لمستويات الخدمة المقبولة." }
+    ];
+
+    // =========================================================================
+    // حالة التطبيق والمتغيرات
+    // =========================================================================
+    const STORAGE_SCORES_KEY = 'retail_banking_scores_v1';
+    const STORAGE_MISSED_KEY = 'retail_banking_missed_v1';
+
+    let currentGroupKey = 'g1';
+    let activeQuestions = [];
+    let currentIndex = 0;
+    let score = 0;
+    let isAnswered = false;
+    let selectedMultiIndices = [];
+    let sessionWrongItems = [];
+    let quizStartTime = null;
+
+    const GROUP_NAMES = {
+      g1: 'المجموعة الأولى (1 - 100)',
+      g2: 'المجموعة الثانية (101 - 200)',
+      g3: 'المجموعة الثالثة (201 - 302)',
+      all: 'الاختبار الشامل الكامل (1 - 302)',
+      missed: 'مراجعة الأسئلة الخاطئة'
+    };
+
+    const ARABIC_LETTERS = ['أ', 'ب', 'ج', 'د', 'هـ', 'و'];
+
+    // =========================================================================
+    // التهيئة وإدارة التخزين المحلي
+    // =========================================================================
+    function initApp() {
+      refreshDashboardStats();
+      updateRandomLabel();
+    }
+
+    function getSavedScores() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_SCORES_KEY)) || {};
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function saveGroupScore(groupKey, newScore, total) {
+      if (groupKey === 'missed') return;
+      try {
+        const scores = getSavedScores();
+        const percent = Math.round((newScore / total) * 100);
+        const prev = scores[groupKey];
+        if (!prev || percent >= prev.percent) {
+          scores[groupKey] = { score: newScore, total, percent };
+        } else {
+          scores[groupKey].lastScore = newScore;
+          scores[groupKey].lastPercent = percent;
+        }
+        localStorage.setItem(STORAGE_SCORES_KEY, JSON.stringify(scores));
+      } catch (e) {}
+    }
+
+    function getMissedIds() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_MISSED_KEY)) || [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function addMissedId(qId) {
+      try {
+        const ids = new Set(getMissedIds());
+        ids.add(qId);
+        localStorage.setItem(STORAGE_MISSED_KEY, JSON.stringify([...ids]));
+      } catch (e) {}
+    }
+
+    function removeMissedId(qId) {
+      try {
+        const ids = getMissedIds().filter(id => id !== qId);
+        localStorage.setItem(STORAGE_MISSED_KEY, JSON.stringify(ids));
+      } catch (e) {}
+    }
+
+    function clearMissedQuestions() {
+      try {
+        localStorage.removeItem(STORAGE_MISSED_KEY);
+        refreshDashboardStats();
+      } catch (e) {}
+    }
+
+    function refreshDashboardStats() {
+      const scores = getSavedScores();
+      ['g1', 'g2', 'g3', 'all'].forEach(key => {
+        const badge = document.getElementById(`badge-${key}`);
+        if (!badge) return;
+        if (scores[key]) {
+          badge.textContent = `أعلى درجة: ${scores[key].score}/${scores[key].total} (${scores[key].percent}%)`;
+          badge.className = key === 'all'
+            ? 'text-xs font-extrabold text-amber-300'
+            : 'text-xs font-extrabold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200';
+        } else {
+          badge.textContent = 'لم يتم الاختبار';
+        }
+      });
+
+      const missedIds = getMissedIds();
+      document.getElementById('savedWrongCount').textContent = missedIds.length;
+      document.getElementById('missedCountInline').textContent = missedIds.length;
+      const missedBox = document.getElementById('missedQuestionsBox');
+      if (missedIds.length > 0) {
+        missedBox.classList.remove('hidden');
+      } else {
+        missedBox.classList.add('hidden');
+      }
+    }
+
+    function updateRandomLabel() {
+      const isRandom = document.getElementById('globalRandomToggle').checked;
+      const label = document.getElementById('randomModeText');
+      if (isRandom) {
+        label.textContent = 'عشوائي (موصى به)';
+        label.className = 'text-xs text-emerald-700 font-semibold';
+      } else {
+        label.textContent = 'تسلسلي حسب الترتيب';
+        label.className = 'text-xs text-slate-600 font-semibold';
+      }
+    }
+
+    // خوارزمية خلط عشوائي (Fisher-Yates)
+    function shuffleArray(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    // =========================================================================
+    // بدء الاختبار والتنقل بين الأسئلة
+    // =========================================================================
+    function startQuiz(groupKey, customQuestionList = null) {
+      currentGroupKey = groupKey;
+      let pool = [];
+
+      if (customQuestionList) {
+        pool = [...customQuestionList];
+      } else if (groupKey === 'g1') {
+        pool = QUESTIONS_DB.filter(q => q.id >= 1 && q.id <= 100);
+      } else if (groupKey === 'g2') {
+        pool = QUESTIONS_DB.filter(q => q.id >= 101 && q.id <= 200);
+      } else if (groupKey === 'g3') {
+        pool = QUESTIONS_DB.filter(q => q.id >= 201 && q.id <= 302);
+      } else if (groupKey === 'all') {
+        pool = [...QUESTIONS_DB];
+      } else if (groupKey === 'missed') {
+        const missedIds = new Set(getMissedIds());
+        pool = QUESTIONS_DB.filter(q => missedIds.has(q.id));
+      }
+
+      if (pool.length === 0) return;
+
+      const isRandom = document.getElementById('globalRandomToggle').checked;
+      activeQuestions = isRandom ? shuffleArray(pool) : pool;
+
+      currentIndex = 0;
+      score = 0;
+      sessionWrongItems = [];
+      quizStartTime = Date.now();
+
+      document.getElementById('quizGroupTitle').textContent = GROUP_NAMES[groupKey] || 'اختبار تفاعلي';
+      document.getElementById('totalQCount').textContent = activeQuestions.length;
+      document.getElementById('liveScore').textContent = '0';
+
+      switchView('quizView');
+      renderCurrentQuestion();
+    }
+
+    function renderCurrentQuestion() {
+      isAnswered = false;
+      selectedMultiIndices = [];
+
+      const qObj = activeQuestions[currentIndex];
+      const total = activeQuestions.length;
+
+      document.getElementById('currentQIndex').textContent = currentIndex + 1;
+      document.getElementById('originalQBadge').textContent = `رقم السؤال في البنك: #${qObj.id}`;
+      document.getElementById('questionText').textContent = qObj.q;
+
+      const progressPct = Math.round(((currentIndex) / total) * 100);
+      document.getElementById('progressBar').style.width = `${Math.max(progressPct, 2)}%`;
+
+      // إظهار تنبيه الاختيار المتعدد إن وجد
+      const multiHint = document.getElementById('multiSelectHint');
+      const multiSubmitWrapper = document.getElementById('multiSubmitWrapper');
+      const submitMultiBtn = document.getElementById('submitMultiBtn');
+
+      if (qObj.multi > 1) {
+        multiHint.classList.remove('hidden');
+        multiHint.textContent = qObj.multi === 2
+          ? 'مطلوب اختيار إجابتين صحيحتين'
+          : `مطلوب اختيار ${qObj.multi} إجابات صحيحة`;
+        multiSubmitWrapper.classList.remove('hidden');
+        submitMultiBtn.disabled = true;
+      } else {
+        multiHint.classList.add('hidden');
+        multiSubmitWrapper.classList.add('hidden');
+      }
+
+      // إخفاء التغذية الراجعة وزر التالي
+      document.getElementById('feedbackBox').classList.add('hidden');
+      document.getElementById('nextBtnWrapper').classList.add('hidden');
+
+      // بناء أزرار الخيارات
+      const container = document.getElementById('optionsContainer');
+      container.innerHTML = '';
+
+      qObj.options.forEach((optText, idx) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.dataset.index = idx;
+        btn.className = 'option-card w-full text-right p-4 rounded-xl border-2 border-slate-200 bg-slate-50/60 hover:bg-white hover:border-navy-800/50 flex items-start gap-3 focus:outline-none';
+        btn.onclick = () => handleOptionClick(idx);
+
+        const indicator = document.createElement('span');
+        indicator.className = 'opt-badge w-7 h-7 rounded-lg bg-white border border-slate-300 text-navy-900 font-extrabold text-xs flex items-center justify-center shrink-0 mt-0.5';
+        indicator.textContent = ARABIC_LETTERS[idx] || (idx + 1);
+
+        const textSpan = document.createElement('span');
+        textSpan.className = 'text-sm sm:text-base font-semibold text-slate-800 leading-snug flex-1';
+        textSpan.textContent = optText;
+
+        btn.appendChild(indicator);
+        btn.appendChild(textSpan);
+        container.appendChild(btn);
+      });
+    }
+
+    function handleOptionClick(idx) {
+      if (isAnswered) return;
+      const qObj = activeQuestions[currentIndex];
+
+      if (qObj.multi === 1) {
+        evaluateAnswer([idx]);
+      } else {
+        // تبديل التحديد في الأسئلة متعددة الاختيارات
+        const pos = selectedMultiIndices.indexOf(idx);
+        if (pos > -1) {
+          selectedMultiIndices.splice(pos, 1);
+        } else {
+          if (selectedMultiIndices.length < qObj.multi) {
+            selectedMultiIndices.push(idx);
+          }
+        }
+        updateMultiSelectionUI(qObj.multi);
+      }
+    }
+
+    function updateMultiSelectionUI(requiredCount) {
+      const buttons = document.querySelectorAll('#optionsContainer button');
+      buttons.forEach(btn => {
+        const idx = Number(btn.dataset.index);
+        const badge = btn.querySelector('.opt-badge');
+        if (selectedMultiIndices.includes(idx)) {
+          btn.classList.remove('border-slate-200', 'bg-slate-50/60');
+          btn.classList.add('border-navy-800', 'bg-blue-50/80');
+          badge.classList.remove('bg-white', 'text-navy-900', 'border-slate-300');
+          badge.classList.add('bg-navy-800', 'text-white', 'border-navy-800');
+        } else {
+          btn.classList.add('border-slate-200', 'bg-slate-50/60');
+          btn.classList.remove('border-navy-800', 'bg-blue-50/80');
+          badge.classList.add('bg-white', 'text-navy-900', 'border-slate-300');
+          badge.classList.remove('bg-navy-800', 'text-white', 'border-navy-800');
+        }
+      });
+
+      const submitBtn = document.getElementById('submitMultiBtn');
+      submitBtn.disabled = selectedMultiIndices.length !== requiredCount;
+    }
+
+    function submitMultiAnswer() {
+      if (isAnswered) return;
+      const qObj = activeQuestions[currentIndex];
+      if (selectedMultiIndices.length !== qObj.multi) return;
+      evaluateAnswer([...selectedMultiIndices]);
+    }
+
+    function evaluateAnswer(userIndices) {
+      isAnswered = true;
+      const qObj = activeQuestions[currentIndex];
+      const correctSet = new Set(qObj.correct);
+      const userSet = new Set(userIndices);
+
+      const isFullyCorrect =
+        userIndices.length === qObj.correct.length &&
+        userIndices.every(i => correctSet.has(i));
+
+      if (isFullyCorrect) {
+        score++;
+        document.getElementById('liveScore').textContent = score;
+        removeMissedId(qObj.id);
+      } else {
+        addMissedId(qObj.id);
+        sessionWrongItems.push({
+          question: qObj,
+          userSelected: userIndices
+        });
+      }
+
+      // تحديث ألوان الخيارات بعد الإجابة
+      const buttons = document.querySelectorAll('#optionsContainer button');
+      buttons.forEach(btn => {
+        btn.disabled = true;
+        const idx = Number(btn.dataset.index);
+        const badge = btn.querySelector('.opt-badge');
+
+        btn.classList.remove('border-slate-200', 'bg-slate-50/60', 'border-navy-800', 'bg-blue-50/80');
+
+        if (correctSet.has(idx)) {
+          btn.classList.add('border-emerald-600', 'bg-emerald-50');
+          badge.className = 'opt-badge w-7 h-7 rounded-lg bg-emerald-600 text-white font-extrabold text-xs flex items-center justify-center shrink-0 mt-0.5';
+          badge.textContent = '✓';
+        } else if (userSet.has(idx) && !correctSet.has(idx)) {
+          btn.classList.add('border-rose-600', 'bg-rose-50');
+          badge.className = 'opt-badge w-7 h-7 rounded-lg bg-rose-600 text-white font-extrabold text-xs flex items-center justify-center shrink-0 mt-0.5';
+          badge.textContent = '✕';
+        } else {
+          btn.classList.add('border-slate-200', 'bg-slate-50/40', 'opacity-60');
+        }
+      });
+
+      document.getElementById('multiSubmitWrapper').classList.add('hidden');
+
+      // عرض صندوق النتيجة والتوضيح
+      const feedbackBox = document.getElementById('feedbackBox');
+      const feedbackIcon = document.getElementById('feedbackIcon');
+      const feedbackTitle = document.getElementById('feedbackTitle');
+      const feedbackExplanation = document.getElementById('feedbackExplanation');
+
+      feedbackBox.classList.remove('hidden', 'bg-emerald-50', 'border-emerald-300', 'text-emerald-950', 'bg-rose-50', 'border-rose-300', 'text-rose-950');
+
+      if (isFullyCorrect) {
+        feedbackBox.classList.add('bg-emerald-50', 'border-emerald-300', 'text-emerald-950');
+        feedbackIcon.textContent = '✅';
+        feedbackTitle.textContent = 'إجابة صحيحة! أحسنت';
+      } else {
+        feedbackBox.classList.add('bg-rose-50', 'border-rose-300', 'text-rose-950');
+        feedbackIcon.textContent = '❌';
+        const correctLabels = qObj.correct.map(i => `(${ARABIC_LETTERS[i]}) ${qObj.options[i]}`).join(' ، ');
+        feedbackTitle.textContent = `إجابة خاطئة — الإجابة الصحيحة: ${correctLabels}`;
+      }
+
+      feedbackExplanation.textContent = qObj.explanation || '';
+
+      // إظهار زر السؤال التالي أو إنهاء الاختبار
+      const nextBtnWrapper = document.getElementById('nextBtnWrapper');
+      const nextBtnLabel = document.getElementById('nextBtnLabel');
+      nextBtnWrapper.classList.remove('hidden');
+
+      if (currentIndex === activeQuestions.length - 1) {
+        nextBtnLabel.textContent = 'عرض النتيجة النهائية';
+      } else {
+        nextBtnLabel.textContent = 'السؤال التالي';
+      }
+    }
+
+    function nextQuestion() {
+      if (currentIndex < activeQuestions.length - 1) {
+        currentIndex++;
+        renderCurrentQuestion();
+      } else {
+        finishQuiz();
+      }
+    }
+
+    // =========================================================================
+    // شاشة النتائج النهائية والمراجعة
+    // =========================================================================
+    function finishQuiz() {
+      const total = activeQuestions.length;
+      const percent = Math.round((score / total) * 100);
+      const elapsedSeconds = Math.floor((Date.now() - quizStartTime) / 1000);
+      const mins = String(Math.floor(elapsedSeconds / 60)).padStart(2, '0');
+      const secs = String(elapsedSeconds % 60).padStart(2, '0');
+
+      saveGroupScore(currentGroupKey, score, total);
+      refreshDashboardStats();
+
+      document.getElementById('resultGroupBadge').textContent = GROUP_NAMES[currentGroupKey] || 'الاختبار';
+      document.getElementById('finalScoreText').textContent = `${score} / ${total}`;
+      document.getElementById('finalPercentText').textContent = `${percent}%`;
+      document.getElementById('finalTimeText').textContent = `${mins}:${secs}`;
+
+      const passed = percent >= 70;
+      const resultEmoji = document.getElementById('resultEmoji');
+      const resultHeading = document.getElementById('resultHeading');
+      const resultSubheading = document.getElementById('resultSubheading');
+      const finalPercentEl = document.getElementById('finalPercentText');
+
+      if (passed) {
+        resultEmoji.textContent = '🏆';
+        resultHeading.textContent = 'مبارك! اجتزت الاختبار بنجاح';
+        resultSubheading.textContent = 'نتيجة مشرفة جداً وتؤهلك لدخول الاختبار الفعلي بثقة عالية.';
+        finalPercentEl.className = 'text-xl sm:text-2xl font-extrabold text-emerald-600';
+      } else {
+        resultEmoji.textContent = '📚';
+        resultHeading.textContent = 'تحتاج إلى مزيد من المراجعة';
+        resultSubheading.textContent = 'نسبة الاجتياز المطلوبة 70% — راجع الأسئلة الخاطئة بالأسفل وأعد المحاولة.';
+        finalPercentEl.className = 'text-xl sm:text-2xl font-extrabold text-rose-600';
+      }
+
+      // زر التدرب على أخطاء هذه الجلسة
+      const retrySessionBtn = document.getElementById('retrySessionWrongBtn');
+      const wrongReviewSection = document.getElementById('wrongReviewSection');
+      const wrongReviewList = document.getElementById('wrongReviewList');
+
+      if (sessionWrongItems.length > 0) {
+        retrySessionBtn.classList.remove('hidden');
+        document.getElementById('sessionWrongCount').textContent = sessionWrongItems.length;
+        wrongReviewSection.classList.remove('hidden');
+        wrongReviewList.innerHTML = '';
+
+        sessionWrongItems.forEach((item, idx) => {
+          const q = item.question;
+          const userText = item.userSelected.map(i => q.options[i]).join(' + ');
+          const correctText = q.correct.map(i => q.options[i]).join(' + ');
+
+          const card = document.createElement('div');
+          card.className = 'bg-white rounded-2xl p-5 shadow-sm border border-rose-200 space-y-2.5';
+          card.innerHTML = `
+            <div class="flex items-center justify-between text-xs text-slate-500">
+              <span class="font-bold text-rose-700">خطأ رقم ${idx + 1}</span>
+              <span>رقم السؤال: #${q.id}</span>
+            </div>
+            <p class="font-extrabold text-navy-900 text-sm sm:text-base">${q.q}</p>
+            <div class="text-xs sm:text-sm space-y-1 pt-1">
+              <p class="text-rose-700 bg-rose-50 px-3 py-1.5 rounded-lg"><strong>إجابتك:</strong> ${userText}</p>
+              <p class="text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-lg"><strong>الإجابة الصحيحة:</strong> ${correctText}</p>
+            </div>
+            ${q.explanation ? `<p class="text-xs text-slate-600 pt-1">💡 ${q.explanation}</p>` : ''}
+          `;
+          wrongReviewList.appendChild(card);
+        });
+      } else {
+        retrySessionBtn.classList.add('hidden');
+        wrongReviewSection.classList.add('hidden');
+      }
+
+      switchView('resultsView');
+    }
+
+    function restartCurrentQuiz() {
+      startQuiz(currentGroupKey);
+    }
+
+    function practiceSessionWrong() {
+      if (sessionWrongItems.length === 0) return;
+      const wrongQuestions = sessionWrongItems.map(item => item.question);
+      startQuiz('missed', wrongQuestions);
+    }
+
+    // =========================================================================
+    // التنقل بين الشاشات والنوافذ
+    // =========================================================================
+    function switchView(viewId) {
+      ['homeView', 'quizView', 'resultsView'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+      });
+      document.getElementById(viewId).classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function confirmExit() {
+      document.getElementById('exitModal').classList.remove('hidden');
+    }
+
+    function closeExitModal() {
+      document.getElementById('exitModal').classList.add('hidden');
+    }
+
+    function goHome() {
+      closeExitModal();
+      refreshDashboardStats();
+      switchView('homeView');
+    }
+
+    // تشغيل التطبيق عند اكتمال التحميل
+    window.addEventListener('DOMContentLoaded', initApp);
+  </script>
+</body>
+</html>
